@@ -72,6 +72,7 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
 </div>
 <script>
 const FPS=30, DUR=45.0;
+const NOTEXT=new URLSearchParams(location.search).has('notext'); // clean plates: no kinetic captions
 const CLIPS='clips/';
 const N={night_wide:270,night_seoul:165,golden:225,skins:162,build:240,growthL1:75,growthL2:75,growthL3:75,growthL4:75,
  feat_bg:115,final:180,chrome_night:150,chrome_golden:185,chrome_final:130,win_research:48,win_policy:48};
@@ -198,7 +199,7 @@ async function render(t){
  $('eri').style.transform='translate(-50%,-50%) scale('+(0.9+0.1*sm(lin(t,4.4,7.6)))+')';
  shotEls[0].querySelector('img.f').style.filter+=' brightness('+(1-.35*Math.max(mg,ei))+')';
  // captions
- const line=TEXT.find(L=>t>=L.w[0][1]&&t<L.t1),tx=$('txt');
+ const line=NOTEXT?null:TEXT.find(L=>t>=L.w[0][1]&&t<L.t1),tx=$('txt');
  if(!line)tx.innerHTML='';
  else{const out=line.cut?1:1-sm(lin(t,line.t1-.45,line.t1));
   tx.innerHTML=line.w.map(([w,a])=>{const k=sm(lin(t,a,a+.55)),c=Math.round(150+105*sm(lin(t,a+.15,a+.7)));
