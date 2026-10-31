@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 SR = 48000
-DUR = 45.0
+DUR = 45.6
 BEAT = 0.6
 N = int(SR * DUR)
 L = np.zeros(N)
@@ -157,8 +157,8 @@ def chord_at(t):
     return CH[int(t // BAR) % 4]
 
 
-# pads through the whole piece
-END = 41.4  # final hit / end card
+# pads through the whole piece (v3 timeline)
+END = 42.1  # ER mark completes
 for b in range(int(DUR / BAR) + 1):
     t0 = b * BAR
     if t0 >= END:
@@ -168,18 +168,16 @@ for b in range(int(DUR / BAR) + 1):
     add(pad(voic, min(BAR, END - t0), att=.9, rel=1.4), t0, pan=-.15, gain=g)
     add(pad([v + 12 for v in voic[1:3]], min(BAR, END - t0), att=1.2, rel=1.4), t0, pan=.25, gain=g * .35)
 
-# opening drone + shimmer
-add(pad([35, 47], 8.4, att=2.5, rel=2.0), 0.0, gain=.5)
+# opening: publisher card on black (0.5), ER over the night map (4.6)
+add(pad([35, 47], 8.4, att=2.0, rel=2.0), 0.0, gain=.5)
 for k in range(9):
     add(bell(83 + [0, 3, 7, 10, 12][k % 5], 2.5), 0.4 + k * 0.82, pan=((k % 3) - 1) * .5, gain=.06)
-
-# logo hits: Maplegrid 0.8, ER 4.4
-add(swell(.8), 0.0, gain=.6)
-add(bell(74, 4) + bell(86, 4) * .5, .8, gain=.35)
-add(boom(.45, 3.0), .8)
-add(swell(1.2), 3.2, gain=.7)
-add(boom(.75, 4.0), 4.4)
-add(bell(62, 4) + bell(69, 4) * .6 + bell(74, 4) * .4, 4.4, gain=.35)
+add(swell(.5), 0.0, gain=.5)
+add(bell(74, 4) + bell(86, 4) * .5, .5, gain=.33)
+add(boom(.4, 3.0), .5)
+add(swell(1.2), 3.4, gain=.7)
+add(boom(.75, 4.0), 4.6)
+add(bell(62, 4) + bell(69, 4) * .6 + bell(74, 4) * .4, 4.6, gain=.35)
 
 
 def arps(t0, t1, gain, bright=1.0, every=1):
@@ -224,7 +222,7 @@ for t in (14.4, 15.6, 16.8):
     add(bell(chord_at(t)[2][0] + 12, 1.5), t, gain=.18)
 add(swell(.6), 17.4, gain=.6)
 
-# 18.0 - 21.6: skins — hats, a hit on each switch
+# 18.0 - 21.6: skins
 for t in np.arange(18.0, 21.6 - 1e-6, BEAT):
     add(kick(.75), t)
     add(hat(), t + BEAT / 2, pan=.3)
@@ -235,7 +233,7 @@ for t in (18.0, 19.2, 20.4):
     add(boom(.4, 1.2), t)
     add(snare(), t + BEAT, gain=.5)
 
-# 21.6 - 25.2: "쉽게 잇다" — lighter, riser into the era section
+# 21.6 - 25.2: "쉽게 잇다" — lighter, riser into the era graphic
 add(boom(.5, 2.5), 21.6)
 arps(21.6, 25.2, .2, .8)
 for t in np.arange(21.6, 25.2 - 1e-6, BAR):
@@ -243,37 +241,40 @@ for t in np.arange(21.6, 25.2 - 1e-6, BAR):
 add(riser(2.0), 23.2, gain=.5)
 add(swell(1.2), 24.0, gain=.8)
 
-# 25.2 - 33.6: era groove; ticking during each year roll, a hit when the year lands
+# 25.2 - 33.6: era graphic groove; a hit and a sweep at each new chapter
 groove(25.2, 33.6)
-for land in (27.3, 29.4, 31.5, 33.3):
-    for k, t in enumerate(np.arange(land - .75, land - 1e-6, .075)):
-        add(hat(), t, pan=(.4 if k % 2 else -.4), gain=.7)
-    add(boom(.45, 1.8), land)
-    add(bell(86, 1.5), land, gain=.14)
-add(boom(.55, 2.0), 25.2)
+for t in (25.2, 27.3, 29.4, 31.5):
+    add(boom(.5, 1.8), t)
+    add(swell(.5, hp=4000), t - .5, gain=.45)
+    add(bell(86, 1.5), t, gain=.14)
 
-# 33.6 - 37.2: feature glimpses — groove continues, hit per window
-groove(33.6, 37.2, kick_g=.8, snare_g=.6, sub_g=.8, arp_g=.24, bright=1.2)
-for t in (33.6, 34.8, 36.0):
+# 33.6 - 38.4: four feature windows
+groove(33.6, 38.4, kick_g=.8, snare_g=.6, sub_g=.8, arp_g=.24, bright=1.2)
+for t in (33.6, 34.8, 36.0, 37.2):
     add(boom(.45, 1.4), t)
     add(bell(chord_at(t)[2][2] + 12, 1.2), t, gain=.15)
-add(swell(.6), 36.6, gain=.8)
+add(swell(.6), 37.8, gain=.7)
 
-# 37.2 - 41.4: breakdown, build to the logo
-add(boom(.7, 4.0), 37.2)
-arps(37.2, 41.4, .2, .7, every=2)
-add(riser(2.6), 38.8, gain=.55)
-add(swell(1.4), 40.0, gain=.9)
-for i, t in enumerate(np.arange(39.6, 41.4 - 1e-6, BEAT / 2)):
-    add(kick(.35 + i * .08), t)
+# 38.4 - 41.0: network grows out of Seoul — airy, rising
+add(boom(.6, 3.0), 38.4)
+arps(38.4, 41.0, .24, .9)
+add(riser(1.8), 39.2, gain=.5)
+add(swell(1.0), 40.0, gain=.8)
 
-# 41.4: final hit and ring-out (release date at 42.6)
+# 41.0 - 42.1: lines assemble the mark — a whoosh per stroke, pops for the pills
+for t in (41.0, 41.12, 41.45, 41.5):
+    add(swell(.25, hp=3000), t, gain=.35)
+    add(pluck(86, .6, 1.4), t + .2, gain=.12)
+for t in (42.05, 42.15):
+    add(pluck(93, .5, 1.6), t, gain=.25)
+
+# 42.1: the mark is complete — final hit and ring-out
 add(boom(1.0, 4.0), END)
 for m, g in ((50, .5), (57, .4), (62, .4), (66, .35), (69, .3), (74, .25)):
-    add(pad([m], 2.4, att=.02, rel=1.6), END, gain=g * .9)
-add(bell(74, 4) + bell(81, 4) * .6 + bell(86, 4) * .4, 41.6, gain=.32)
-add(bell(78, 3), 42.6, gain=.18)
-add(bell(86, 3), 43.2, gain=.12)
+    add(pad([m], 2.6, att=.02, rel=1.6), END, gain=g * .9)
+add(bell(74, 4) + bell(81, 4) * .6 + bell(86, 4) * .4, END + .1, gain=.32)
+add(bell(78, 3), 43.0, gain=.16)
+add(bell(86, 3), 43.6, gain=.12)
 
 # ---------- reverb (FFT convolution with synthetic IR) ----------
 def reverb(x, secs=2.6, mix=.28, seed=1):
