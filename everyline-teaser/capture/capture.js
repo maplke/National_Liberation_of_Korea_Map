@@ -1,7 +1,7 @@
 // Frame-stepped footage capture from Everyline: Rail (capture copy with __ev hook).
 const L=require('./lib');
 const fs=require('fs');
-const FPS=30, OUT=process.env.OUT||'/tmp/tr/clips';
+const FPS=30, OUT='/tmp/tr/clips';
 const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 const lerp=(a,b,t)=>a+(b-a)*t;
 
@@ -45,7 +45,40 @@ async function shoot(p,name,frames,perFrame){
   console.log(name,frames,'frames',((Date.now()-t0)/1000).toFixed(1)+'s');
 }
 
+
+// open a game window from the bottom bar, record its rect, capture with a moving cursor
+async function winClip(name,btn,act){
+  const {b,p}=await prep({skin:'classic',warm:60,spd:4}); await hideToast(p); await cursor(p);
+  await p.locator(`#bot button:has-text("${btn}"):visible`).first().click(); await p.waitForTimeout(600);
+  await p.evaluate(()=>{document.querySelectorAll('button').forEach(b=>{if(b.textContent.trim()==='도움말 끄기'&&b.offsetParent)b.click();});});
+  await p.waitForTimeout(200);
+  const r=await p.evaluate(()=>{const w=[...document.querySelectorAll('#wins > *')].filter(e=>e.offsetParent).pop();const q=w.getBoundingClientRect();return [q.x,q.y,q.width,q.height];});
+  fs.mkdirSync(OUT,{recursive:true}); fs.writeFileSync(`${OUT}/${name}.rect.json`,JSON.stringify(r.map(v=>v*1.5)));
+  await p.mouse.move(r[0]+r[2]*.3,r[1]+r[3]*.6);
+  await shoot(p,name,48,async(i,t)=>{ await act(p,i,r); if(i<16) await p.mouse.move(r[0]+r[2]*lerp(.3,.55,t*3),r[1]+r[3]*lerp(.6,.4,t*3)); });
+  await b.close();
+}
+
 const CLIPS={
+  // ---- v2: ghost UI chrome (side panels + bottom bar) with numbers running at 16x ----
+  async chrome_night(){ const {b,p}=await prep({skin:'widget',warm:200,hour:1.5,spd:16}); await hideToast(p);
+    await shoot(p,'chrome_night',150); await b.close(); },
+  async chrome_golden(){ const {b,p}=await prep({skin:'classic',warm:200,hour:18.9,spd:16}); await hideToast(p);
+    await shoot(p,'chrome_golden',185); await b.close(); },
+  async chrome_final(){ const {b,p}=await prep({skin:'classic',warm:200,hour:3.5,spd:16}); await hideToast(p);
+    await shoot(p,'chrome_final',130,async(i,t)=>p.evaluate(h=>{window.__H=h},lerp(3.5,7.6,t))); await b.close(); },
+  async growth_long(){ for(const ch of [1,2,3,4]){ const {b,p}=await prep({ch,skin:'paper',cine:true,warm:20});
+      const a=await cityPos(p,'서울'),c=await cityPos(p,'부산'),cx=(a[0]+c[0])/2,cy=(a[1]+c[1])/2;
+      await shoot(p,'growthL'+ch,75,async(i,t)=>setCam(p,cx,cy,1.55+(ch-1)*0.06+0.06*t));
+      await b.close(); } },
+  async feat_bg(){ const {b,p}=await prep({skin:'widget',cine:true,warm:200,hour:21.5});
+    const a=await cityPos(p,'대전');
+    await shoot(p,'feat_bg',115,async(i,t)=>setCam(p,a[0]+lerp(-30,30,t),a[1]+lerp(10,-10,t),lerp(2.6,3.0,t))); await b.close(); },
+  async win_research(){ await winClip('win_research','연구',async(p,i,r)=>{}); },
+  async win_policy(){ await winClip('win_policy','정책',async(p,i,r)=>{
+      if(i===16){ const bb=await p.locator('#wins button:has-text("강화"):visible').first().boundingBox(); if(bb) await p.mouse.move(bb.x+bb.width/2,bb.y+bb.height/2,{steps:1}); }
+      if(i===22){ await p.mouse.down(); await p.mouse.up(); } }); },
+
   async night_wide(){ const {b,p}=await prep({skin:'widget',cine:true,warm:200,hour:2});
     const a=await cityPos(p,'서울'),c=await cityPos(p,'부산'),cx=(a[0]+c[0])/2,cy=(a[1]+c[1])/2;
     await shoot(p,'night_wide',9*FPS,async(i,t)=>setCam(p,cx+lerp(10,-6,t),cy+lerp(-4,4,t),lerp(1.75,2.2,ease(t))));

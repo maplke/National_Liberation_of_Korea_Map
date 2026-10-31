@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="utf-8">
-<title>Everyline: Rail — Launch Teaser composition</title>
+<title>Everyline: Rail — Launch Teaser v2 composition</title>
 <style>
 @font-face{font-family:W;font-weight:400;src:url(assets/ELWanted-400.woff2) format('woff2')}
 @font-face{font-family:W;font-weight:600;src:url(assets/ELWanted-600.woff2) format('woff2')}
@@ -13,6 +13,11 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
 .shot img.glow{position:absolute;inset:0;width:100%;height:100%;filter:blur(14px) brightness(1.6);mix-blend-mode:screen;opacity:0}
 .shot .grade{position:absolute;inset:0;pointer-events:none}
 .vig{position:absolute;inset:0;background:radial-gradient(ellipse 75% 70% at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%);pointer-events:none}
+/* ghost UI: real game panels laid faintly over the cinematic shots */
+.ghost{position:absolute;inset:0;opacity:0;pointer-events:none}
+.ghost .cr{position:absolute;overflow:hidden}
+.ghost .cr img{position:absolute;width:1920px;height:1080px;max-width:none}
+.ghost .tick{transform-origin:0 100%}
 .scrim{position:absolute;inset:0;background:radial-gradient(ellipse 46% 26% at 50% 50%,rgba(10,14,22,.62),rgba(10,14,22,.25) 55%,transparent 100%);opacity:0}
 #txt{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-family:W,P,sans-serif;font-weight:600;
   font-size:76px;letter-spacing:-.01em;color:#fff;white-space:nowrap;text-shadow:0 2px 30px rgba(0,0,0,.55),0 0 3px rgba(0,0,0,.35)}
@@ -20,78 +25,135 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
 .logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:0}
 #top{position:absolute;top:34px;left:0;right:0;text-align:center;font-family:W,P;font-weight:400;font-size:21px;letter-spacing:.18em;color:rgba(255,255,255,.62);opacity:0}
 #wm{position:absolute;right:40px;bottom:34px;width:74px;opacity:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
-#year{position:absolute;left:96px;bottom:84px;font-family:W;font-weight:600;font-size:132px;color:#fff;letter-spacing:-.02em;opacity:0;text-shadow:0 4px 40px rgba(0,0,0,.4)}
-#year small{display:block;font-size:30px;font-weight:400;letter-spacing:.04em;opacity:.8;margin-bottom:-6px}
+/* era section */
+#era{position:absolute;inset:0;opacity:0}
+#era .yr{position:absolute;left:96px;bottom:150px;font-family:W;font-weight:600;font-size:150px;line-height:1;color:#fff;letter-spacing:-.02em;text-shadow:0 4px 40px rgba(0,0,0,.4);font-variant-numeric:tabular-nums}
+#era .sub{position:absolute;left:100px;bottom:312px;font-family:W,P;font-weight:400;font-size:32px;color:rgba(255,255,255,.85);letter-spacing:.02em}
+#era .st{position:absolute;left:100px;bottom:92px;font-family:W,P;font-weight:400;font-size:30px;color:rgba(255,255,255,.78);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+#era .st b{font-weight:600;color:#fff;margin:0 .15em 0 .35em}
+.news{position:absolute;width:600px;overflow:hidden;border-radius:12px;box-shadow:0 18px 50px rgba(0,0,0,.45);opacity:0;
+  -webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 100%)}
+.news img{display:block;width:600px}
+/* feature glimpses */
+#feat{position:absolute;inset:0;perspective:1600px}
+.win{position:absolute;left:50%;top:47%;opacity:0;border-radius:12px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6);transform-style:preserve-3d}
+.win .cr{position:relative;overflow:hidden}
+.win .cr img{position:absolute;max-width:none}
+.flab{position:absolute;left:96px;bottom:96px;font-family:W,P;color:#fff;opacity:0;text-shadow:0 2px 20px rgba(0,0,0,.5)}
+.flab b{display:block;font-weight:600;font-size:64px;letter-spacing:-.01em}
+.flab i{display:block;font-style:normal;font-weight:400;font-size:22px;letter-spacing:.32em;opacity:.7;margin-top:6px}
 #white{position:absolute;inset:0;background:#fff;opacity:0}
 #end{position:absolute;inset:0;opacity:0}
-#end .banner{position:absolute;left:50%;top:44%;width:1180px;transform:translate(-50%,-50%)}
-#end .soon{position:absolute;left:0;right:0;top:63%;text-align:center;font-family:W,P;color:#2B2F36}
-#end .soon b{display:block;font-weight:600;font-size:44px;letter-spacing:.32em;margin-left:.32em}
-#end .soon i{display:block;font-style:normal;font-weight:600;font-size:34px;letter-spacing:.4em;margin:16px 0 0 .4em;color:#5A606B}
+#end .banner{position:absolute;left:50%;top:42%;width:1180px;transform:translate(-50%,-50%)}
+#end .soon{position:absolute;left:0;right:0;top:62%;text-align:center;font-family:W,P;color:#2B2F36}
+#end .soon b{display:block;font-weight:600;font-size:46px;letter-spacing:.12em;margin-left:.12em}
+#end .soon i{display:block;font-style:normal;font-weight:400;font-size:26px;letter-spacing:.34em;margin:16px 0 0 .34em;color:#6B717C}
 #end .pub{position:absolute;left:50%;bottom:64px;width:230px;transform:translateX(-50%);opacity:.9}
 #black{position:absolute;inset:0;background:#000;opacity:1}
 </style></head>
 <body><div id="stage">
  <div id="shots"></div>
+ <div id="ghosts"></div>
+ <div id="feat"></div>
+ <div id="era"><div class="sub"></div><div class="yr"></div><div class="st"></div></div>
  <div class="scrim" id="scrim"></div>
  <div id="txt"></div>
  <img class="logo" id="mg" src="assets/maplegrid_h.png" style="width:640px">
  <img class="logo" id="eri" src="assets/er_icon.png" style="width:330px">
- <div id="year"></div>
  <img id="wm" src="assets/er_icon.png">
  <div id="white"></div>
  <div id="end">
   <img class="banner" src="assets/er_banner.png">
-  <div class="soon"><b>COMING SOON</b><i>곧 출시</i></div>
+  <div class="soon"><b>2026.12 출시 예정</b><i>DEC 2026 · PC / ANDROID</i></div>
   <img class="pub" src="assets/maplegrid_dark.png">
  </div>
  <div id="top">모든 장면은 실제 게임 화면입니다</div>
  <div id="black"></div>
 </div>
 <script>
-const FPS=30, BEAT=0.6;
+const FPS=30, DUR=45.0;
 const CLIPS='clips/';
-const N={night_wide:270,night_seoul:165,golden:225,skins:162,build:240,layer:96,growth1:48,growth2:48,growth3:48,growth4:48,trains:102,research:96,final:180};
-// shot list: clip, start/end on the trailer clock, first clip frame, fade in/out, look, zoom (Ken Burns scale from->to)
+const N={night_wide:270,night_seoul:165,golden:225,skins:162,build:240,growthL1:75,growthL2:75,growthL3:75,growthL4:75,
+ feat_bg:115,final:180,chrome_night:150,chrome_golden:185,chrome_final:130,win_research:48,win_policy:48};
+const fr=(c,i)=>CLIPS+c+'/'+String(Math.max(0,Math.min(N[c]-1,i))).padStart(4,'0')+'.jpg';
+
+// ---------- shots: clip, trailer in/out, first frame, playback speed, fades, look, Ken Burns ----------
 const SHOTS=[
- {c:'night_wide', t0:0,    t1:8.4,  f0:0,  fi:0,   fo:.4, look:'night', z:[1.0,1.03]},
- {c:'night_seoul',t0:8.0,  t1:13.2, f0:0,  fi:.4,  fo:0,  look:'night', z:[1.02,1.06]},
- {c:'golden',     t0:13.2, t1:20.4, f0:0,  fi:0,   fo:0,  look:'golden',z:[1.0,1.05]},
- {c:'skins',      t0:20.4, t1:25.2, f0:0,  fi:0,   fo:0,  look:'clean', z:[1.0,1.03]},
- {c:'build',      t0:25.2, t1:29.4, f0:0,  fi:0,   fo:0,  look:'ui',    z:[1.0,1.035]},
- {c:'layer',      t0:29.4, t1:31.8, f0:6,  fi:0,   fo:0,  look:'ui',    z:[1.03,1.0]},
- {c:'growth1',    t0:31.8, t1:33.1, f0:4,  fi:0,   fo:.25,look:'clean', z:[1.0,1.0]},
- {c:'growth2',    t0:32.85,t1:34.3, f0:4,  fi:.25, fo:.25,look:'clean', z:[1.0,1.0]},
- {c:'growth3',    t0:34.05,t1:35.5, f0:4,  fi:.25, fo:.25,look:'clean', z:[1.0,1.0]},
- {c:'growth4',    t0:35.25,t1:36.6, f0:4,  fi:.25, fo:0,  look:'clean', z:[1.0,1.0]},
- {c:'trains',     t0:36.6, t1:39.0, f0:10, fi:0,   fo:0,  look:'ui',    z:[1.0,1.04]},
- {c:'research',   t0:39.0, t1:41.4, f0:10, fi:0,   fo:0,  look:'ui',    z:[1.04,1.0]},
- {c:'final',      t0:41.4, t1:47.6, f0:0,  fi:0,   fo:0,  look:'dawn',  z:[1.0,1.0]},
+ {c:'night_wide', t0:0,    t1:7.9,  f0:0,  fi:0,  fo:.4, look:'night', z:[1.0,1.03]},
+ {c:'night_seoul',t0:7.5,  t1:12.0, f0:0,  fi:.4, fo:0,  look:'night', z:[1.02,1.06]},
+ {c:'golden',     t0:12.0, t1:18.0, f0:0,  fi:0,  fo:0,  look:'golden',z:[1.0,1.05]},
+ {c:'skins',      t0:18.0, t1:21.6, f0:0,  fi:0,  fo:0,  look:'clean', z:[1.0,1.03]},
+ {c:'build',      t0:21.6, t1:25.2, f0:8,  fi:0,  fo:0,  look:'ui',    z:[1.0,1.035]},
+ {c:'growthL1',   t0:25.2, t1:27.4, f0:0,  fi:0,  fo:.25,look:'clean', z:[1.0,1.0]},
+ {c:'growthL2',   t0:27.15,t1:29.5, f0:0,  fi:.25,fo:.25,look:'clean', z:[1.0,1.0]},
+ {c:'growthL3',   t0:29.25,t1:31.6, f0:0,  fi:.25,fo:.25,look:'clean', z:[1.0,1.0]},
+ {c:'growthL4',   t0:31.35,t1:33.6, f0:0,  fi:.25,fo:0,  look:'clean', z:[1.0,1.02]},
+ {c:'feat_bg',    t0:33.6, t1:37.2, f0:0,  fi:0,  fo:0,  look:'featbg',z:[1.04,1.0]},
+ {c:'final',      t0:37.2, t1:41.4, f0:0,  sp:1.4, fi:0, fo:0, look:'dawn', z:[1.0,1.0]},
 ];
-// kinetic text: each word fades/de-blurs in at its own time; whole line leaves at t1
+// ---------- ghost UI: side panels + bottom bar from real 16x-speed captures, plus an enlarged ticker ----------
+const CR={L:[7,7,259,1015],R:[1552,7,361,1015],T:[205,1029,600,51]};
+const GHOSTS=[
+ {c:'chrome_night', t0:8.2,  t1:12.0, f0:0,  mode:'screen',   op:.42},
+ {c:'chrome_golden',t0:12.0, t1:18.0, f0:0,  mode:'multiply', op:.34},
+ {c:'chrome_final', t0:37.5, t1:41.1, f0:0,  mode:'multiply', op:.34},
+];
+// ---------- kinetic captions ----------
 const TEXT=[
- {t1:14.2, w:[['꿈꿀 수',9.6],['있다면',10.8]]},
- {t1:16.2, w:[['이을 수',14.4],['있다',15.0]]},
- {t1:17.4, w:[['빠르게 잇다',16.2]], cut:1},
- {t1:18.6, w:[['멀리 잇다',17.4]], cut:1},
- {t1:20.4, w:[['촘촘하게 잇다',18.6]], cut:1},
+ {t1:12.6, w:[['꿈꿀 수',8.4],['있다면',9.6]]},
+ {t1:14.4, w:[['이을 수',12.6],['있다',13.2]]},
+ {t1:15.6, w:[['빠르게 잇다',14.4]], cut:1},
+ {t1:16.8, w:[['멀리 잇다',15.6]], cut:1},
+ {t1:18.0, w:[['촘촘하게 잇다',16.8]], cut:1},
+ {t1:19.2, w:[['당신답게 잇다',18.0]], cut:1},
+ {t1:20.4, w:[['Connect your way',19.2]], cut:1},
  {t1:21.6, w:[['당신답게 잇다',20.4]], cut:1},
- {t1:22.8, w:[['Connect your way',21.6]], cut:1},
- {t1:24.0, w:[['당신답게 잇다',22.8]], cut:1},
- {t1:25.2, w:[['Connect your way',24.0]], cut:1},
- {t1:29.0, w:[['쉽게 잇다',25.6]]},
- {t1:46.2, w:[['모든 선은',42.0],['당신에게서 시작된다',43.2]]},
+ {t1:25.0, w:[['쉽게 잇다',22.0]]},
+ {t1:27.4, w:[['시대를 잇다',25.5]]},
+ {t1:41.0, w:[['모든 선은',37.8],['당신에게서 시작된다',38.7]]},
 ];
-const YEARS=[[31.8,1960,'창업과 첫 간선'],[33.0,1975,'전철화와 도로 방어'],[34.2,1990,'고속철 건설'],[35.4,2005,'고속망 완성']];
+// ---------- era section: year roll, chapter stats from the game, real 철도신보 headlines ----------
+const ERA=[ // time the year lands, year, chapter title, [lines, stations, km] at that chapter's start
+ [25.2,1960,'1챕터 · 창업과 첫 간선',[0,0,0]],
+ [27.3,1975,'2챕터 · 전철화와 도로 방어',[22,103,2123]],
+ [29.4,1990,'3챕터 · 고속철 건설',[23,105,2166]],
+ [31.5,2005,'4챕터 · 고속망 완성과 축소 균형',[25,110,2567]],
+ [33.3,2030,'4챕터 · 고속망 완성과 축소 균형',[25,110,2567]],
+];
+const NEWS=[ // card, in-time, out-time, top(px), crop height(px at 600w)
+ ['ch1_0',25.5,27.5,150,118],['ch1_4',26.0,27.5,300,330],
+ ['ch2_0',27.5,29.6,150,118],['ch2_2',28.0,29.6,300,300],
+ ['ch3_1',29.6,31.7,150,118],['ch1_3',30.1,31.7,300,118],
+ ['ch4_0',31.7,33.6,150,118],['ch4_3',32.2,33.6,300,330],
+];
+// ---------- feature glimpses ----------
+const FEAT=[ // label, en, t0, t1, source
+ {lab:'연구',en:'RESEARCH',   t0:33.6,t1:34.85,c:'win_research',rect:[280.5,13.5,1254,840],w:1080,f0:4},
+ {lab:'의뢰',en:'COMMISSIONS',t0:34.8,t1:36.05,img:'news/ch1_4.png',iw:690,ih:600,w:600},
+ {lab:'정책',en:'POLICY',     t0:36.0,t1:37.2, c:'win_policy',rect:[298.5,31.5,570,480],w:820,f0:6},
+];
 
 const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const sm=x=>{x=cl(x);return x*x*(3-2*x);};
 const lin=(t,a,b)=>cl((t-a)/(b-a));
 const $=id=>document.getElementById(id);
+const waits=[];
+function setSrc(img,src){ if(!img.getAttribute('src')||!img.getAttribute('src').endsWith(src)){img.src=src;waits.push(img.decode().catch(()=>{}));} }
 
-// build shot DOM
+// ----- DOM -----
 const shotEls=SHOTS.map(s=>{const d=document.createElement('div');d.className='shot';
  d.innerHTML='<img class="f"><img class="glow"><div class="grade"></div><div class="vig"></div>';$('shots').appendChild(d);return d;});
+const ghostEls=GHOSTS.map(g=>{const d=document.createElement('div');d.className='ghost';d.style.mixBlendMode=g.mode;
+ d.innerHTML=['L','R'].map(k=>{const r=CR[k];return '<div class="cr" style="left:'+r[0]+'px;top:'+r[1]+'px;width:'+r[2]+'px;height:'+r[3]+'px"><img style="left:'+(-r[0])+'px;top:'+(-r[1])+'px"></div>';}).join('')
+  +'<div class="cr tick" style="left:60px;top:'+(1080-60-51)+'px;width:600px;height:51px;transform:scale(1.75)"><img style="left:-205px;top:-1029px"></div>';
+ $('ghosts').appendChild(d);return d;});
+const newsEls=NEWS.map(n=>{const d=document.createElement('div');d.className='news';d.style.height=n[4]+'px';
+ d.innerHTML='<img src="'+CLIPS+'news/'+n[0]+'.png">';$('era').appendChild(d);return d;});
+const featEls=FEAT.map(f=>{const d=document.createElement('div');d.className='win';
+ if(f.c){const s=f.w/f.rect[2];d.innerHTML='<div class="cr" style="width:'+f.w+'px;height:'+(f.rect[3]*s)+'px"><img style="width:'+(1920*s)+'px;height:'+(1080*s)+'px;left:'+(-f.rect[0]*s)+'px;top:'+(-f.rect[1]*s)+'px"></div>';}
+ else {const s=f.w/f.iw;d.innerHTML='<div class="cr" style="width:'+f.w+'px;height:'+(f.ih*s)+'px;-webkit-mask-image:linear-gradient(180deg,#000 75%,transparent)"><img src="'+CLIPS+f.img+'" style="width:'+f.w+'px;left:0;top:0"></div>';}
+ $('feat').appendChild(d);
+ const l=document.createElement('div');l.className='flab';l.innerHTML='<b>'+f.lab+'</b><i>'+f.en+'</i>';$('feat').appendChild(l);f.labEl=l;return d;});
 
 function looks(el,look,t,s){
  const f=el.querySelector('img.f'),g=el.querySelector('img.glow'),gr=el.querySelector('.grade'),v=el.querySelector('.vig');
@@ -103,66 +165,75 @@ function looks(el,look,t,s){
    gr.style.mixBlendMode='multiply';gr.style.opacity=.85;}
  if(look==='clean'){f.style.filter='contrast(1.04) saturate(1.08)';v.style.opacity=.55;}
  if(look==='ui'){f.style.filter='contrast(1.03) saturate(1.05)';v.style.opacity=.35;}
+ if(look==='featbg'){f.style.filter='brightness(.55) saturate(1.1) blur(3px)';g.style.opacity=.35;v.style.opacity=1;}
  if(look==='dawn'){const k=lin(t,s.t0,s.t1);
    f.style.filter='contrast(1.06) saturate(1.12)';g.style.opacity=.5*(1-k);v.style.opacity=1-k*.7;
    gr.style.background='linear-gradient(180deg,rgba(255,160,90,.9),rgba(255,210,170,.2) 60%,transparent)';gr.style.mixBlendMode='soft-light';
    gr.style.opacity=Math.sin(Math.PI*cl(k*1.15));}
 }
+const fade=(t,a,b,fi,fo)=>(t<a||t>=b)?0:Math.min(fi?sm(lin(t,a,a+fi)):1,fo?sm(1-lin(t,b-fo,b)):1);
+const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
 
 async function render(t){
- const waits=[];
- SHOTS.forEach((s,i)=>{const el=shotEls[i];
-  if(t<s.t0||t>=s.t1){el.style.opacity=0;return;}
-  let o=1; if(s.fi) o=Math.min(o,sm(lin(t,s.t0,s.t0+s.fi))); if(s.fo) o=Math.min(o,sm(1-lin(t,s.t1-s.fo,s.t1)));
-  el.style.opacity=o;
-  const fr=Math.min(N[s.c]-1,s.f0+Math.floor((t-s.t0)*FPS+1e-6));
-  const src=CLIPS+s.c+'/'+String(fr).padStart(4,'0')+'.jpg';
-  const f=el.querySelector('img.f'),g=el.querySelector('img.glow');
-  if(!f.src.endsWith(src)){f.src=src;waits.push(f.decode().catch(()=>{}));}
-  if(s.look==='night'||s.look==='dawn'||s.look==='golden'){ if(!g.src.endsWith(src)){g.src=src;waits.push(g.decode().catch(()=>{}));} }
-  const k=lin(t,s.t0,s.t1),z=s.z[0]+(s.z[1]-s.z[0])*k; f.style.transform=g.style.transform='scale('+z+')';
-  looks(el,s.look,t,s);
- });
- // opening black, top caption
- $('black').style.opacity=1-sm(lin(t,0,1.4)) + sm(lin(t,53.2,54.0));
- $('top').style.opacity=.9*sm(lin(t,.6,1.4))*(1-sm(lin(t,6.6,7.6)));
- // publisher + game logo over the night map
- const mg=sm(lin(t,1.0,2.0))*(1-sm(lin(t,4.0,4.6)));
- $('mg').style.opacity=mg; $('mg').style.filter='blur('+((1-sm(lin(t,1.0,2.2)))*10)+'px)';
- $('mg').style.transform='translate(-50%,-50%) scale('+(0.96+0.04*sm(lin(t,1,4.6)))+')';
- const ei=sm(lin(t,5.0,5.9))*(1-sm(lin(t,7.7,8.3)));
- $('eri').style.opacity=ei; $('eri').style.filter='blur('+((1-sm(lin(t,5.0,6.1)))*12)+'px) drop-shadow(0 0 40px rgba(255,220,150,.25))';
- $('eri').style.transform='translate(-50%,-50%) scale('+(0.9+0.1*sm(lin(t,5,8.3)))+')';
- // darken the map behind logos
+ waits.length=0;
+ // shots
+ SHOTS.forEach((s,i)=>{const el=shotEls[i];const o=fade(t,s.t0,s.t1,s.fi,s.fo);el.style.opacity=o;if(!o)return;
+  const src=fr(s.c,s.f0+Math.floor((t-s.t0)*FPS*(s.sp||1)+1e-6));
+  const f=el.querySelector('img.f'),g=el.querySelector('img.glow');setSrc(f,src);
+  if(['night','dawn','golden','featbg'].includes(s.look))setSrc(g,src);
+  const k=lin(t,s.t0,s.t1),z=s.z[0]+(s.z[1]-s.z[0])*k;f.style.transform=g.style.transform='scale('+z+')';
+  looks(el,s.look,t,s);});
+ // ghost UI
+ GHOSTS.forEach((g,i)=>{const el=ghostEls[i];const o=fade(t,g.t0,g.t1,.6,.5)*g.op;el.style.opacity=o;if(!o)return;
+  const src=fr(g.c,g.f0+Math.floor((t-g.t0)*FPS));el.querySelectorAll('img').forEach(im=>setSrc(im,src));
+  el.style.filter='blur(.5px)';el.style.transform='scale('+(1.0+.015*lin(t,g.t0,g.t1))+')';});
+ // opening
+ $('black').style.opacity=1-sm(lin(t,0,1.4)) + sm(lin(t,44.3,45.0));
+ $('top').style.opacity=.9*sm(lin(t,.6,1.4))*(1-sm(lin(t,6.4,7.2)));
+ const mg=sm(lin(t,.8,1.8))*(1-sm(lin(t,3.4,4.0)));
+ $('mg').style.opacity=mg;$('mg').style.filter='blur('+((1-sm(lin(t,.8,2.0)))*10)+'px)';
+ $('mg').style.transform='translate(-50%,-50%) scale('+(0.96+0.04*sm(lin(t,.8,4)))+')';
+ const ei=sm(lin(t,4.4,5.3))*(1-sm(lin(t,7.0,7.6)));
+ $('eri').style.opacity=ei;$('eri').style.filter='blur('+((1-sm(lin(t,4.4,5.5)))*12)+'px) drop-shadow(0 0 40px rgba(255,220,150,.25))';
+ $('eri').style.transform='translate(-50%,-50%) scale('+(0.9+0.1*sm(lin(t,4.4,7.6)))+')';
  shotEls[0].querySelector('img.f').style.filter+=' brightness('+(1-.35*Math.max(mg,ei))+')';
- // kinetic text
- const line=TEXT.find(L=>t>=L.w[0][1]&&t<L.t1);
- const tx=$('txt');
- if(!line){tx.innerHTML='';}
- else{
-  const out=line.cut?1:1-sm(lin(t,line.t1-.45,line.t1));
-  tx.innerHTML=line.w.map(([w,a])=>{const k=sm(lin(t,a,a+.55));
-   const c=Math.round(150+105*sm(lin(t,a+.15,a+.7)));
+ // captions
+ const line=TEXT.find(L=>t>=L.w[0][1]&&t<L.t1),tx=$('txt');
+ if(!line)tx.innerHTML='';
+ else{const out=line.cut?1:1-sm(lin(t,line.t1-.45,line.t1));
+  tx.innerHTML=line.w.map(([w,a])=>{const k=sm(lin(t,a,a+.55)),c=Math.round(150+105*sm(lin(t,a+.15,a+.7)));
    return '<span style="opacity:'+(k*out)+';filter:blur('+((1-k)*9)+'px);transform:translateY('+((1-k)*14)+'px);color:rgb('+c+','+c+','+c+')">'+w+'</span>';}).join('');
-  tx.style.fontSize=(line.w[0][0].length>9?70:76)+'px';
- }
- // scrim behind text on bright shots
- const bright=(t>=13.2&&t<29.4)||(t>=41.4&&t<47);
+  tx.style.fontSize=(line.w[0][0].length>9?70:76)+'px';}
+ const bright=(t>=12&&t<25.2)||(t>=37.2&&t<41.4);
  $('scrim').style.opacity=(line&&bright)?1:0;
- // year counter during the growth montage
- const Y=[...YEARS].reverse().find(y=>t>=y[0]);
- if(Y&&t<36.6){ $('year').style.opacity=sm(lin(t,31.8,32.1))*(1-sm(lin(t,36.3,36.6)));
-   $('year').innerHTML='<small>'+Y[2]+'</small>'+Y[1]; } else $('year').style.opacity=0;
- // watermark
- $('wm').style.opacity=.85*sm(lin(t,8.4,9.0))*(1-sm(lin(t,46.4,47.2)));
- // white out from the dawn zoom into the end card
- $('white').style.opacity=sm(lin(t,46.6,47.6));
- const e=t>=47.4; $('end').style.opacity=e?1:0;
- if(e){const b=document.querySelector('#end .banner'),k=sm(lin(t,47.7,48.9));
-  b.style.opacity=k;b.style.filter='blur('+((1-k)*14)+'px)';b.style.transform='translate(-50%,-50%) scale('+(0.94+0.06*sm(lin(t,47.7,53.5)))+')';
-  const s2=document.querySelector('#end .soon'),k2=sm(lin(t,49.5,50.3));s2.style.opacity=k2;s2.style.transform='translateY('+((1-k2)*16)+'px)';
-  document.querySelector('#end .pub').style.opacity=.9*sm(lin(t,50.4,51.2));}
+ // era: rolling year, stats, headlines
+ const eo=fade(t,25.2,33.6,.4,.35);$('era').style.opacity=eo;
+ if(eo){let k=0;while(k<ERA.length-1&&t>=ERA[k+1][0])k++;
+  let y=ERA[k][1],sv=ERA[k][3],sub=ERA[k][2];
+  if(k<ERA.length-1){const a=ERA[k],b=ERA[k+1],r=ease(lin(t,b[0]-.75,b[0]));
+   y=Math.round(a[1]+(b[1]-a[1])*r);sv=a[3].map((v,j)=>Math.round(v+(b[3][j]-v)*r));if(r>.5)sub=b[2];}
+  document.querySelector('#era .yr').textContent=y;
+  document.querySelector('#era .sub').textContent=sub;
+  document.querySelector('#era .st').innerHTML='노선<b>'+sv[0]+'</b> · 역<b>'+sv[1]+'</b> · 선로<b>'+sv[2].toLocaleString()+'</b>km';
+  NEWS.forEach((n,i)=>{const el=newsEls[i],o=fade(t,n[1],n[2],.45,.35);el.style.opacity=o*.93;
+   const ki=sm(lin(t,n[1],n[1]+.55)),ko=sm(lin(t,n[2]-.35,n[2]));
+   el.style.left=(1240+(1-ki)*60)+'px';el.style.top=(n[3]-ko*40)+'px';el.style.filter='blur('+((1-ki)*6)+'px)';});}
+ // feature glimpses
+ FEAT.forEach((f,i)=>{const el=featEls[i],o=fade(t,f.t0,f.t1,.3,.25);el.style.opacity=o;f.labEl.style.opacity=o;
+  if(!o)return;const k=lin(t,f.t0,f.t1);
+  if(f.c)setSrc(el.querySelector('img'),fr(f.c,f.f0+Math.floor((t-f.t0)*FPS)));
+  else el.querySelector('img').style.transform='translateY('+(-k*140)+'px)';
+  el.style.transform='translate(-50%,-50%) rotateY('+(-9+6*k)+'deg) rotateX(3deg) scale('+(0.95+0.06*k)+')';
+  f.labEl.style.transform='translateY('+((1-sm(lin(t,f.t0,f.t0+.4)))*16)+'px)';});
+ // watermark, white-out, end card
+ $('wm').style.opacity=.85*sm(lin(t,7.8,8.4))*(1-sm(lin(t,40.4,41.0)));
+ $('white').style.opacity=sm(lin(t,40.6,41.4));
+ const e=t>=41.3;$('end').style.opacity=e?1:0;
+ if(e){const b=document.querySelector('#end .banner'),k=sm(lin(t,41.5,42.6));
+  b.style.opacity=k;b.style.filter='blur('+((1-k)*14)+'px)';b.style.transform='translate(-50%,-50%) scale('+(0.94+0.06*sm(lin(t,41.5,45)))+')';
+  const s2=document.querySelector('#end .soon'),k2=sm(lin(t,42.6,43.3));s2.style.opacity=k2;s2.style.transform='translateY('+((1-k2)*16)+'px)';
+  document.querySelector('#end .pub').style.opacity=.9*sm(lin(t,43.2,43.9));}
  await Promise.all(waits);
 }
-window.render=render; window.DURATION=54.0;
+window.render=render;window.DURATION=DUR;
 </script></body></html>

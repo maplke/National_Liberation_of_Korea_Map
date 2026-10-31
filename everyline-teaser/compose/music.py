@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 SR = 48000
-DUR = 54.0
+DUR = 45.0
 BEAT = 0.6
 N = int(SR * DUR)
 L = np.zeros(N)
@@ -158,29 +158,30 @@ def chord_at(t):
 
 
 # pads through the whole piece
+END = 41.4  # final hit / end card
 for b in range(int(DUR / BAR) + 1):
     t0 = b * BAR
-    if t0 >= 47.4:
+    if t0 >= END:
         break
     root, voic, _ = chord_at(t0)
-    g = .32 if t0 < 8.4 else .26
-    add(pad(voic, BAR, att=.9, rel=1.4), t0, pan=-.15, gain=g)
-    add(pad([v + 12 for v in voic[1:3]], BAR, att=1.2, rel=1.4), t0, pan=.25, gain=g * .35)
+    g = .32 if t0 < 7.8 else .26
+    add(pad(voic, min(BAR, END - t0), att=.9, rel=1.4), t0, pan=-.15, gain=g)
+    add(pad([v + 12 for v in voic[1:3]], min(BAR, END - t0), att=1.2, rel=1.4), t0, pan=.25, gain=g * .35)
 
 # opening drone + shimmer
-add(pad([35, 47], 9.0, att=2.5, rel=2.0), 0.0, gain=.5)
-for k in range(10):
+add(pad([35, 47], 8.4, att=2.5, rel=2.0), 0.0, gain=.5)
+for k in range(9):
     add(bell(83 + [0, 3, 7, 10, 12][k % 5], 2.5), 0.4 + k * 0.82, pan=((k % 3) - 1) * .5, gain=.06)
 
-# logo hits
-add(swell(1.0), 0.0, gain=.6)
-add(bell(74, 4) + bell(86, 4) * .5, 1.0, gain=.35)
-add(boom(.45, 3.0), 1.0)
-add(swell(1.2), 3.8, gain=.7)
-add(boom(.75, 4.0), 5.0)
-add(bell(62, 4) + bell(69, 4) * .6 + bell(74, 4) * .4, 5.0, gain=.35)
+# logo hits: Maplegrid 0.8, ER 4.4
+add(swell(.8), 0.0, gain=.6)
+add(bell(74, 4) + bell(86, 4) * .5, .8, gain=.35)
+add(boom(.45, 3.0), .8)
+add(swell(1.2), 3.2, gain=.7)
+add(boom(.75, 4.0), 4.4)
+add(bell(62, 4) + bell(69, 4) * .6 + bell(74, 4) * .4, 4.4, gain=.35)
 
-# 8.4 - 13.2: gentle piano arpeggio in 8ths
+
 def arps(t0, t1, gain, bright=1.0, every=1):
     t = t0
     k = 0
@@ -192,74 +193,87 @@ def arps(t0, t1, gain, bright=1.0, every=1):
         k += 1
 
 
-arps(8.4, 13.2, .34, .8)
-add(pad([47, 54], 4.8, att=1.5, rel=1.5), 8.4, gain=.25)
-add(swell(1.2), 12.0, gain=.8)
+def groove(t0, t1, kick_g=.9, snare_g=.8, sub_g=.9, arp_g=.26, bright=1.3):
+    for i, t in enumerate(np.arange(t0, t1 - 1e-6, BEAT)):
+        add(kick(kick_g), t)
+        if snare_g and i % 2 == 1:
+            add(snare(), t, gain=snare_g)
+        add(hat(), t + BEAT / 2, pan=.3)
+        if i % 8 == 7:
+            add(hat(True), t + BEAT / 2, pan=-.3)
+    for t in np.arange(t0, t1 - 1e-6, BAR):
+        add(sub(chord_at(t)[0] - 12, min(BAR, t1 - t)), t, gain=sub_g)
+    arps(t0, t1, arp_g, bright)
 
-# 13.2 - 20.4: drive. kick on every beat, sub bass, brighter arps
-for t in np.arange(13.2, 20.4 - 1e-6, BEAT):
+
+# 7.8 - 12.0: night, gentle arpeggio
+arps(7.8, 12.0, .34, .8)
+add(pad([47, 54], 4.2, att=1.5, rel=1.5), 7.8, gain=.25)
+add(swell(1.2), 10.8, gain=.8)
+
+# 12.0 - 18.0: golden drive; hits on every caption change
+for t in np.arange(12.0, 18.0 - 1e-6, BEAT):
     add(kick(.8), t)
-for t in np.arange(13.2, 20.4 - 1e-6, BAR):
-    add(sub(chord_at(t)[0] - 12, BAR), t, gain=.8)
-arps(13.2, 20.4, .26, 1.0)
-for t in (13.2, 14.4):
-    add(boom(.6, 3.0), t)
-for t in (16.2, 17.4, 18.6):  # text swaps
+for t in np.arange(12.0, 18.0 - 1e-6, BAR):
+    add(sub(chord_at(t)[0] - 12, BAR), t, gain=.6)
+arps(12.0, 18.0, .26, 1.0)
+add(boom(.6, 3.0), 12.0)
+add(boom(.5, 2.0), 12.6)
+for t in (14.4, 15.6, 16.8):
     add(boom(.35, 1.5), t)
     add(bell(chord_at(t)[2][0] + 12, 1.5), t, gain=.18)
-add(swell(.6), 19.8, gain=.6)
+add(swell(.6), 17.4, gain=.6)
 
-# 20.4 - 25.2: playful — hats + toms on each skin switch
-for t in np.arange(20.4, 25.2 - 1e-6, BEAT):
+# 18.0 - 21.6: skins — hats, a hit on each switch
+for t in np.arange(18.0, 21.6 - 1e-6, BEAT):
     add(kick(.75), t)
     add(hat(), t + BEAT / 2, pan=.3)
-for t in np.arange(20.4, 25.2 - 1e-6, BAR):
-    add(sub(chord_at(t)[0] - 12, BAR), t, gain=.8)
-arps(20.4, 25.2, .26, 1.2)
-for t in (20.4, 21.6, 22.8, 24.0):
+for t in np.arange(18.0, 21.6 - 1e-6, BAR):
+    add(sub(chord_at(t)[0] - 12, BAR), t, gain=.6)
+arps(18.0, 21.6, .26, 1.2)
+for t in (18.0, 19.2, 20.4):
     add(boom(.4, 1.2), t)
     add(snare(), t + BEAT, gain=.5)
 
-# 25.2 - 29.4: "쉽게 잇다" — lighter, then riser
-add(boom(.5, 2.5), 25.2)
-arps(25.2, 29.4, .2, .8, every=1)
-for t in np.arange(25.2, 29.4 - 1e-6, BAR):
-    add(sub(chord_at(t)[0] - 12, BAR), t, gain=.5)
-add(riser(2.4), 27.0, gain=.5)
-add(swell(1.2), 28.2, gain=.8)
+# 21.6 - 25.2: "쉽게 잇다" — lighter, riser into the era section
+add(boom(.5, 2.5), 21.6)
+arps(21.6, 25.2, .2, .8)
+for t in np.arange(21.6, 25.2 - 1e-6, BAR):
+    add(sub(chord_at(t)[0] - 12, min(BAR, 25.2 - t)), t, gain=.45)
+add(riser(2.0), 23.2, gain=.5)
+add(swell(1.2), 24.0, gain=.8)
 
-# 29.4 - 41.4: full montage groove
-for i, t in enumerate(np.arange(29.4, 41.4 - 1e-6, BEAT)):
-    add(kick(.9), t)
-    if i % 2 == 1:
-        add(snare(), t, gain=.8)
-    add(hat(), t + BEAT / 2, pan=.3)
-    if i % 8 == 7:
-        add(hat(True), t + BEAT / 2, pan=-.3)
-for t in np.arange(29.4, 41.4 - 1e-6, BAR):
-    add(sub(chord_at(t)[0] - 12, BAR), t, gain=.9)
-arps(29.4, 41.4, .26, 1.3)
-for t in (29.4, 31.8, 33.0, 34.2, 35.4, 36.6, 39.0):
-    add(boom(.45, 1.8), t)
-for t in (31.8, 33.0, 34.2, 35.4):  # year ticks
-    add(bell(86, 1.5), t, gain=.14)
-add(swell(1.2), 40.2, gain=.8)
+# 25.2 - 33.6: era groove; ticking during each year roll, a hit when the year lands
+groove(25.2, 33.6)
+for land in (27.3, 29.4, 31.5, 33.3):
+    for k, t in enumerate(np.arange(land - .75, land - 1e-6, .075)):
+        add(hat(), t, pan=(.4 if k % 2 else -.4), gain=.7)
+    add(boom(.45, 1.8), land)
+    add(bell(86, 1.5), land, gain=.14)
+add(boom(.55, 2.0), 25.2)
 
-# 41.4 - 47.4: breakdown, then build to the logo
-add(boom(.7, 4.0), 41.4)
-arps(41.4, 47.4, .2, .7, every=2)
-add(riser(3.0), 44.4, gain=.55)
-add(swell(1.6), 45.8, gain=.9)
-for i, t in enumerate(np.arange(45.0, 47.4 - 1e-6, BEAT / 2)):
-    add(kick(.35 + i * .07), t)
+# 33.6 - 37.2: feature glimpses — groove continues, hit per window
+groove(33.6, 37.2, kick_g=.8, snare_g=.6, sub_g=.8, arp_g=.24, bright=1.2)
+for t in (33.6, 34.8, 36.0):
+    add(boom(.45, 1.4), t)
+    add(bell(chord_at(t)[2][2] + 12, 1.2), t, gain=.15)
+add(swell(.6), 36.6, gain=.8)
 
-# 47.4: final hit and ring-out
-add(boom(1.0, 6.0), 47.4)
+# 37.2 - 41.4: breakdown, build to the logo
+add(boom(.7, 4.0), 37.2)
+arps(37.2, 41.4, .2, .7, every=2)
+add(riser(2.6), 38.8, gain=.55)
+add(swell(1.4), 40.0, gain=.9)
+for i, t in enumerate(np.arange(39.6, 41.4 - 1e-6, BEAT / 2)):
+    add(kick(.35 + i * .08), t)
+
+# 41.4: final hit and ring-out (release date at 42.6)
+add(boom(1.0, 4.0), END)
 for m, g in ((50, .5), (57, .4), (62, .4), (66, .35), (69, .3), (74, .25)):
-    add(pad([m], 4.0, att=.02, rel=3.0), 47.4, gain=g * .9)
-add(bell(74, 6) + bell(81, 6) * .6 + bell(86, 6) * .4, 47.6, gain=.32)
-add(bell(78, 5), 49.5, gain=.18)  # COMING SOON
-add(bell(86, 5), 50.4, gain=.12)
+    add(pad([m], 2.4, att=.02, rel=1.6), END, gain=g * .9)
+add(bell(74, 4) + bell(81, 4) * .6 + bell(86, 4) * .4, 41.6, gain=.32)
+add(bell(78, 3), 42.6, gain=.18)
+add(bell(86, 3), 43.2, gain=.12)
 
 # ---------- reverb (FFT convolution with synthetic IR) ----------
 def reverb(x, secs=2.6, mix=.28, seed=1):
