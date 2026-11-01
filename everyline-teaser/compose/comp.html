@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="utf-8">
-<title>Everyline: Rail — Launch Teaser v3 composition</title>
+<title>Everyline: Rail — Launch Teaser v4 composition</title>
 <style>
 @font-face{font-family:W;font-weight:400;src:url(assets/ELWanted-400.woff2) format('woff2')}
 @font-face{font-family:W;font-weight:600;src:url(assets/ELWanted-600.woff2) format('woff2')}
@@ -20,28 +20,28 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
 .scrim{position:absolute;inset:0;background:radial-gradient(ellipse 46% 26% at 50% 50%,rgba(10,14,22,.62),rgba(10,14,22,.25) 55%,transparent 100%);opacity:0}
 #txt{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-family:W,P,sans-serif;font-weight:600;
   font-size:76px;letter-spacing:-.01em;color:#fff;white-space:nowrap;text-shadow:0 2px 30px rgba(0,0,0,.55),0 0 3px rgba(0,0,0,.35)}
-#txt.left{text-align:left;left:120px;right:auto;top:47%}
+#txt.left{text-align:left;left:120px;right:auto;top:50%}
 #txt.ink{text-shadow:0 0 22px #fff,0 0 8px #fff,0 0 3px #fff}
 #txt span{display:inline-block;margin:0 .14em}
 #txt.left span{margin:0 .28em 0 0}
 .logo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);opacity:0}
 #top{position:absolute;top:34px;left:0;right:0;text-align:center;font-family:W,P;font-weight:400;font-size:21px;letter-spacing:.18em;color:rgba(255,255,255,.62);opacity:0}
 #wm{position:absolute;right:40px;bottom:34px;width:74px;opacity:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35))}
-/* ---------- era motion graphic ---------- */
-#era{position:absolute;inset:0;opacity:0;z-index:1;background:radial-gradient(ellipse 80% 90% at 62% 50%,#1d1813 0%,#0f0d0b 60%,#080706 100%)}
-#era .dots{position:absolute;inset:0;width:1920px;height:1080px}
-#era svg{position:absolute;inset:0}
-#era .hd{position:absolute;left:120px;top:86px;font-family:W,P;color:#fff}
-#era .hd i{display:block;font-style:normal;font-weight:600;font-size:22px;letter-spacing:.08em;color:#E9B04F}
-#era .hd b{display:block;font-weight:600;font-size:56px;letter-spacing:-.01em;margin-top:8px}
-#era .hd u{display:block;text-decoration:none;font-weight:400;font-size:24px;color:rgba(255,255,255,.62);margin-top:8px}
-#era .yr{position:absolute;right:110px;top:70px;font-family:W;font-weight:600;font-size:120px;line-height:1;color:#F2B84E;letter-spacing:.02em;font-variant-numeric:tabular-nums;text-shadow:0 0 30px rgba(242,184,78,.45)}
-#era .st{position:absolute;left:122px;bottom:150px;font-family:W,P;font-weight:400;font-size:28px;color:rgba(255,255,255,.7);font-variant-numeric:tabular-nums;line-height:1.7}
-#era .st b{font-weight:600;color:#fff;font-size:40px;margin:0 .1em 0 .3em}
-#era .tl{position:absolute;left:120px;right:110px;bottom:78px;height:40px}
-#era .tl .bar{position:absolute;left:0;right:0;top:0;height:3px;background:rgba(255,255,255,.14)}
-#era .tl .fill{position:absolute;left:0;top:0;height:3px;background:#E9B04F;box-shadow:0 0 12px rgba(233,176,79,.7)}
-#era .tl span{position:absolute;top:14px;font-family:W;font-size:18px;color:rgba(255,255,255,.45);transform:translateX(-50%)}
+/* ---------- era: game-rendered chapter maps revealed segment by segment ---------- */
+#era{position:absolute;inset:0;opacity:0;z-index:1;background:#94BFE8;overflow:hidden}
+#era canvas{position:absolute;inset:0;transform-origin:62% 50%}
+#era .flash{position:absolute;inset:0;background:#fff;opacity:0}
+#era .hd{position:absolute;left:120px;top:92px;font-family:W,P;color:#1B2230}
+#era .hd i{display:block;font-style:normal;font-weight:600;font-size:24px;letter-spacing:.06em;color:#B5651D}
+#era .hd b{display:block;font-weight:600;font-size:58px;letter-spacing:-.01em;margin-top:8px}
+#era .hd u{display:block;text-decoration:none;font-weight:400;font-size:24px;color:rgba(27,34,48,.65);margin-top:8px}
+#era .yr{position:absolute;left:112px;top:300px;font-family:W;font-weight:600;font-size:176px;line-height:1;color:#1B2230;letter-spacing:-.02em;font-variant-numeric:tabular-nums;transform-origin:0 50%}
+#era .st{position:absolute;left:122px;bottom:140px;font-family:W,P;font-weight:400;font-size:28px;color:rgba(27,34,48,.7);font-variant-numeric:tabular-nums;line-height:1.7}
+#era .st b{font-weight:600;color:#1B2230;font-size:40px;margin:0 .1em 0 .3em}
+#era .tl{position:absolute;left:120px;right:110px;bottom:72px;height:40px}
+#era .tl .bar{position:absolute;left:0;right:0;top:0;height:4px;background:rgba(27,34,48,.15);border-radius:2px}
+#era .tl .fill{position:absolute;left:0;top:0;height:4px;background:#1B2230;border-radius:2px}
+#era .tl span{position:absolute;top:14px;font-family:W;font-size:18px;color:rgba(27,34,48,.55);transform:translateX(-50%)}
 /* ---------- feature glimpses ---------- */
 #feat{position:absolute;inset:0;perspective:1600px}
 .win{position:absolute;left:50%;top:47%;opacity:0;border-radius:12px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6);transform-style:preserve-3d}
@@ -51,9 +51,10 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
 .flab b{display:block;font-weight:600;font-size:64px;letter-spacing:-.01em}
 .flab i{display:block;font-style:normal;font-weight:400;font-size:22px;letter-spacing:.32em;opacity:.7;margin-top:6px}
 .flab u{display:block;text-decoration:none;font-weight:400;font-size:20px;letter-spacing:.06em;opacity:.55;margin-top:14px}
-/* ---------- finale motion graphic ---------- */
+/* ---------- ending: in-game network bursts out of Seoul, then the ER mark ---------- */
+#grow{position:absolute;inset:0;opacity:0;background:#94BFE8}
+#grow canvas{position:absolute;inset:0}
 #fin{position:absolute;inset:0;opacity:0;background:#FBFAF7}
-#fin .dots{position:absolute;inset:0;width:1920px;height:1080px;transform-origin:0 0}
 #fin svg{position:absolute;inset:0}
 #fin .wordmark{position:absolute;opacity:0}
 #fin .rel{position:absolute;opacity:0;font-family:W,P;color:#2B2F36;display:grid;grid-template-columns:auto auto;column-gap:30px;row-gap:6px;font-size:24px}
@@ -66,23 +67,18 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
  <div id="ghosts"></div>
  <div id="feat"></div>
  <div id="era">
-  <img class="dots" src="clips/mg/land_dots_dark.png">
-  <svg id="eraSvg" width="1920" height="1080" viewBox="0 0 1920 1080">
-   <defs><filter id="eg" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/></filter>
-    <radialGradient id="hg"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".25" stop-color="#fff6d8" stop-opacity=".9"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient></defs>
-   <g id="eraGlow" filter="url(#eg)" opacity=".9"></g><g id="eraLines"></g><g id="eraSt"></g><g id="eraHead"></g><g id="eraLab"></g>
-  </svg>
+  <canvas id="eraCv" width="1920" height="1080"></canvas>
+  <div class="flash"></div>
   <div class="hd"><i></i><b></b><u></u></div>
   <div class="yr"></div>
   <div class="st"></div>
   <div class="tl"><div class="bar"></div><div class="fill"></div></div>
  </div>
+ <div id="grow">
+  <canvas id="growCv" width="1920" height="1080"></canvas><img id="gA" style="display:none"><img id="gB" style="display:none">
+ </div>
  <div id="fin">
-  <img class="dots" src="clips/mg/land_dots_light.png">
-  <svg id="finSvg" width="1920" height="1080" viewBox="0 0 1920 1080">
-   <g id="finNet"><g id="fnHalo"></g><g id="fnWhite"></g><g id="fnCol"></g><g id="fnSt"></g></g>
-   <g id="er"></g>
-  </svg>
+  <svg id="finSvg" width="1920" height="1080" viewBox="0 0 1920 1080"><g id="er"></g></svg>
   <img class="wordmark" src="assets/er_wordmark.png">
   <div class="rel"><b>Dec 2026</b><b>PC and Android</b><span>2026.12</span><span>출시 예정</span></div>
  </div>
@@ -95,13 +91,14 @@ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
  <div id="black"></div>
 </div>
 <script>
-const FPS=30, DUR=45.6;
+const FPS=30, DUR=42.6;
 const NOTEXT=new URLSearchParams(location.search).has('notext');
 const CLIPS='clips/';
 const N={v3_night_wide:270,v3_night_seoul:140,v3_golden:186,v3_skins:110,build:240,v3_feat_bg:150,
- v3_chrome_night:130,v3_chrome_golden:186,v3_win_research:48,v3_win_commission:48,v3_win_policy:48,v3_win_finance:48};
-const fr=(c,i)=>CLIPS+c+'/'+String(Math.max(0,Math.min(N[c]-1,i))).padStart(4,'0')+'.jpg';
-const MG=/*MGDATA*/null;
+ v3_chrome_night:130,v3_chrome_golden:186,v3_win_research:48,v3_win_commission:48,v3_win_policy:48,v3_win_finance:48,endA:66,endB:66};
+const fr=(c,i)=>CLIPS+(c.startsWith('end')?'mg4/':'')+c+'/'+String(Math.max(0,Math.min(N[c]-1,i))).padStart(4,'0')+'.jpg';
+const ERA4=/*ERADATA*/null;
+const END4=/*ENDDATA*/null;
 const RECT=/*RECTS*/null;
 
 const SHOTS=[
@@ -110,7 +107,7 @@ const SHOTS=[
  {c:'v3_golden',     t0:12.0, t1:18.0, f0:0, fi:0,  fo:0,  look:'golden',z:[1.0,1.05]},
  {c:'v3_skins',      t0:18.0, t1:21.6, f0:0, fi:0,  fo:0,  look:'clean', z:[1.0,1.03]},
  {c:'build',         t0:21.6, t1:25.2, f0:8, fi:0,  fo:0,  look:'ui',    z:[1.0,1.035]},
- {c:'v3_feat_bg',    t0:33.2, t1:38.4, f0:0, fi:0,  fo:0,  look:'featbg',z:[1.04,1.0]},
+ {c:'v3_feat_bg',    t0:30.8, t1:36.0, f0:0, fi:0,  fo:0,  look:'featbg',z:[1.04,1.0]},
 ];
 const CR={L:[7,7,259,1015],R:[1552,7,361,1015],T:[205,1029,600,51]};
 const GHOSTS=[
@@ -127,14 +124,13 @@ const TEXT=[
  {t1:20.4, w:[['Connect your way',19.2]], cut:1},
  {t1:21.6, w:[['당신답게 잇다',20.4]], cut:1},
  {t1:25.0, w:[['쉽게 잇다',22.0]]},
- {t1:27.2, w:[['시대를',25.6],['잇다',26.0]], cls:'left'},
- {t1:40.8, w:[['모든 선은',38.7],['당신에게서 시작된다',39.3]], cls:'ink', ink:1},
+ {t1:38.1, w:[['모든 선은',36.15],['당신에게서 시작된다',36.6]], cls:'ink', ink:1},
 ];
 const FEAT=[
- {lab:'연구',en:'RESEARCH',   sk:'cassette 스킨',t0:33.6,t1:34.85,c:'v3_win_research',w:1040},
- {lab:'의뢰',en:'COMMISSIONS',sk:'sketch 스킨',  t0:34.8,t1:36.05,c:'v3_win_commission',w:720,ch:760,scroll:1},
- {lab:'정책',en:'POLICY',     sk:'paper 스킨',   t0:36.0,t1:37.25,c:'v3_win_policy',w:820},
- {lab:'경영',en:'MANAGEMENT', sk:'widget 스킨',  t0:37.2,t1:38.4, c:'v3_win_finance',w:900},
+ {lab:'연구',en:'RESEARCH',   sk:'cassette 스킨',t0:31.2,t1:32.45,c:'v3_win_research',w:1040},
+ {lab:'의뢰',en:'COMMISSIONS',sk:'sketch 스킨',  t0:32.4,t1:33.65,c:'v3_win_commission',w:720,ch:760,scroll:1},
+ {lab:'정책',en:'POLICY',     sk:'paper 스킨',   t0:33.6,t1:34.85,c:'v3_win_policy',w:820},
+ {lab:'경영',en:'MANAGEMENT', sk:'widget 스킨',  t0:34.8,t1:36.0, c:'v3_win_finance',w:900},
 ];
 
 const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
@@ -142,15 +138,18 @@ const sm=x=>{x=cl(x);return x*x*(3-2*x);};
 const lin=(t,a,b)=>cl((t-a)/(b-a));
 const eio=x=>{x=cl(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;};
 const eout=x=>{x=cl(x);return 1-Math.pow(1-x,3);};
+const eout5=x=>{x=cl(x);return 1-Math.pow(1-x,5);};
 const back=x=>{x=cl(x);const c1=1.9,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2);};
 const $=id=>document.getElementById(id);
 const NS='http://www.w3.org/2000/svg';
 const mk=(tag,at,par)=>{const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);if(par)par.appendChild(e);return e;};
 const waits=[];
 function setSrc(img,src){if(!img.getAttribute('src')||!img.getAttribute('src').endsWith(src)){img.src=src;waits.push(img.decode().catch(()=>{}));}}
+function setHref(el,src){if(el.getAttribute('href')!==src){el.setAttribute('href',src);}}
 const fade=(t,a,b,fi,fo)=>(t<a||t>=b)?0:Math.min(fi?sm(lin(t,a,a+fi)):1,fo?sm(1-lin(t,b-fo,b)):1);
+const kkey=(a,b)=>a<b?a+'_'+b:b+'_'+a;
 
-// ---------- shots / ghosts / features DOM ----------
+// ---------- shots / ghosts / features ----------
 const shotEls=SHOTS.map(s=>{const d=document.createElement('div');d.className='shot';
  d.innerHTML='<img class="f"><img class="glow"><div class="grade"></div><div class="vig"></div>';$('shots').appendChild(d);return d;});
 const ghostEls=GHOSTS.map(g=>{const d=document.createElement('div');d.className='ghost';d.style.mixBlendMode=g.mode;
@@ -161,7 +160,6 @@ const featEls=FEAT.map(f=>{const r=RECT[f.c],s=f.w/r[2],hh=f.ch?Math.min(f.ch,r[
  d.innerHTML='<div class="cr" style="width:'+f.w+'px;height:'+hh+'px'+(f.ch?';-webkit-mask-image:linear-gradient(180deg,#000 80%,transparent)':'')+'"><img style="width:'+(1920*s)+'px;height:'+(1080*s)+'px;left:'+(-r[0]*s)+'px;top:'+(-r[1]*s)+'px"></div>';
  f.s=s;f.hh=hh;f.rh=r[3]*s;$('feat').appendChild(d);
  const l=document.createElement('div');l.className='flab';l.innerHTML='<b>'+f.lab+'</b><i>'+f.en+'</i><u>'+f.sk+'</u>';$('feat').appendChild(l);f.labEl=l;return d;});
-
 function looks(el,look,t,s){
  const f=el.querySelector('img.f'),g=el.querySelector('img.glow'),gr=el.querySelector('.grade'),v=el.querySelector('.vig');
  f.style.filter='';g.style.opacity=0;gr.style.background='';gr.style.mixBlendMode='';gr.style.opacity=1;v.style.opacity=0;
@@ -175,128 +173,116 @@ function looks(el,look,t,s){
  if(look==='featbg'){f.style.filter='brightness(.55) saturate(1.1) blur(3px)';g.style.opacity=.35;v.style.opacity=1;}
 }
 
-// ---------- shared network geometry (screen coords from the game camera used for MG) ----------
-const CTX=MG.ct;                          // [name,x,y,big,sub]
-const P=i=>[CTX[i][1],CTX[i][2]];
-const kmpp=325/Math.hypot(P(CTX.findIndex(c=>c[0]==='서울'))[0]-P(CTX.findIndex(c=>c[0]==='부산'))[0],P(CTX.findIndex(c=>c[0]==='서울'))[1]-P(CTX.findIndex(c=>c[0]==='부산'))[1]);
-function octi(a,b){ // metro-map style: diagonal then straight
- const [x1,y1]=P(a),[x2,y2]=P(b),dx=x2-x1,dy=y2-y1,m=Math.min(Math.abs(dx),Math.abs(dy));
- const mid=[x1+Math.sign(dx)*m,y1+Math.sign(dy)*m];return [[x1,y1],mid,[x2,y2]];}
-const plen=pts=>{let L=0;for(let i=1;i<pts.length;i++)L+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);return L;};
-const pd=pts=>'M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L');
-function at(pts,l){for(let i=1;i<pts.length;i++){const s=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);if(l<=s||i===pts.length-1){const k=s?cl(l/s):0;return [pts[i-1][0]+(pts[i][0]-pts[i-1][0])*k,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*k];}l-=s;}return pts[pts.length-1];}
-const kkey=(a,b)=>a<b?a+'_'+b:b+'_'+a;
+// ---------- reveal masks: a thick stroke sweeps each new segment of the game's own map ----------
+function revealWidth(L){return Math.min(150,Math.max(44,22+.8*L));}
+function bfsOrder(nets,seeds){ // depth of every node from the seed set over the given network
+ const adj={};nets.forEach(l=>{for(let q=0;q<l.s.length-1;q++){const a=l.s[q],b=l.s[q+1];(adj[a]=adj[a]||[]).push(b);(adj[b]=adj[b]||[]).push(a);}});
+ const d={},Q=[];seeds.forEach(s=>{if(adj[s]){d[s]=0;Q.push(s);}});
+ if(!Q.length){const any=+Object.keys(adj)[0];d[any]=0;Q.push(any);}
+ while(Q.length){const u=Q.shift();(adj[u]||[]).forEach(v=>{if(d[v]==null){d[v]=d[u]+1;Q.push(v);}});}
+ return d;}
 
-// ---------- era motion graphic: real chapter networks extend era by era ----------
+// ---------- era: 1960 → 1975 → 1990 → 2005 → 2030 on the game's map ----------
 const ERAS=[
- {t0:25.2,t1:27.3,y0:1960,y1:1975,net:'c2',tag:'1챕터 · 1960–1975',title:'창업과 첫 간선',desc:'선로 한 줄 없이 출발합니다'},
- {t0:27.3,t1:29.4,y0:1975,y1:1990,net:'c3',tag:'2챕터 · 1975–1990',title:'전철화와 도로 방어',desc:'도로가 철도의 손님을 빼앗기 시작합니다'},
- {t0:29.4,t1:31.5,y0:1990,y1:2005,net:'c4',tag:'3챕터 · 1990–2005',title:'고속철 건설',desc:'고속철도의 시대가 열립니다'},
- {t0:31.5,t1:33.6,y0:2005,y1:2030,net:'x', tag:'4챕터 · 2005–2030',title:'고속망 완성, 그리고 당신의 노선',desc:'남해안선 · 동해선 · 강원 북부선 · 수도권 순환선 …'},
+ {t0:25.2,t1:26.7,y0:1960,y1:1975,st:'s1',tag:'1챕터 · 1960–1975',title:'창업과 첫 간선',desc:'선로 한 줄 없이 출발합니다'},
+ {t0:26.7,t1:27.6,y0:1975,y1:1990,st:'s2',tag:'2챕터 · 1975–1990',title:'전철화와 도로 방어',desc:'도로가 철도의 손님을 빼앗기 시작합니다'},
+ {t0:27.6,t1:28.5,y0:1990,y1:2005,st:'s3',tag:'3챕터 · 1990–2005',title:'고속철 건설',desc:'고속철도의 시대가 열립니다'},
+ {t0:28.5,t1:31.2,y0:2005,y1:2030,st:'s4',tag:'4챕터 · 2005–2030',title:'그리고 당신의 노선',desc:'남해안선 · 동해선 · 강원 북부선 · 수도권 순환선 …'},
 ];
-const ERA_RUNS=[],ERA_ST={},drawnSeg=new Set();
-const ERA_COL={};
-ERAS.forEach(E=>{const lines=MG.nets[E.net];const runs=[];
- lines.forEach(l=>{let cur=null;for(let q=0;q<l.s.length-1;q++){const a=l.s[q],b=l.s[q+1],k=kkey(a,b);
-   if(drawnSeg.has(k)){cur=null;continue;}drawnSeg.add(k);
-   if(!cur){cur={c:l.c,hs:l.hs,st:[a],n:l.n};runs.push(cur);}cur.st.push(b);}});
- const seoul=P(CTX.findIndex(c=>c[0]==='서울'));
- runs.forEach(r=>{let pts=[];r.st.forEach((s,q)=>{if(q===0)return;const seg=octi(r.st[q-1],s);pts=pts.concat(q===1?seg:seg.slice(1));});
-  r.pts=pts;r.L=plen(pts);r.d0=Math.hypot(pts[0][0]-seoul[0],pts[0][1]-seoul[1]);
-  r.cum=[0];for(let q=1;q<r.st.length;q++)r.cum.push(r.cum[q-1]+plen(octi(r.st[q-1],r.st[q])));});
- runs.sort((a,b)=>a.d0-b.d0);
- const D=E.t1-E.t0,n=runs.length;
- runs.forEach((r,i)=>{r.s0=E.t0+.08+(n>1?i/(n-1):0)*D*.6;r.dur=Math.min(D*.5,Math.max(.4,r.L/520));if(r.s0+r.dur>E.t1-.05)r.dur=Math.max(.2,E.t1-.05-r.s0);
-  r.glow=mk('path',{d:pd(r.pts),fill:'none',stroke:r.c,'stroke-width':10,'stroke-linecap':'round','stroke-linejoin':'round'},$('eraGlow'));
-  r.el=mk('path',{d:pd(r.pts),fill:'none',stroke:r.c,'stroke-width':r.hs?5:4,'stroke-linecap':'round','stroke-linejoin':'round'},$('eraLines'));
-  [r.el,r.glow].forEach(e=>{e.setAttribute('stroke-dasharray',r.L+' '+(r.L+10));e.setAttribute('stroke-dashoffset',r.L);});
-  r.head=mk('circle',{r:16,fill:'url(#hg)',opacity:0},$('eraHead'));
-  r.st.forEach((s,q)=>{if(!ERA_ST[s]||ERA_ST[s].t>r.s0+r.dur*(r.L?r.cum[q]/r.L:0)){
-    if(!ERA_ST[s]){const c=mk('circle',{cx:P(s)[0],cy:P(s)[1],r:3.6,fill:'#14110e',stroke:'#fff','stroke-width':1.6,opacity:0},$('eraSt'));
-      let lab=null;if(CTX[s][3]){lab=mk('text',{x:P(s)[0]+9,y:P(s)[1]-7,fill:'rgba(255,255,255,.85)','font-family':'W','font-size':17,'font-weight':600,opacity:0},$('eraLab'));lab.textContent=CTX[s][0];}
-      ERA_ST[s]={c,lab};}
-    ERA_ST[s].t=r.s0+r.dur*(r.L?r.cum[q]/r.L:0);ERA_ST[s].km=0;}});
-  ERA_RUNS.push(r);});
- E.runs=runs;});
-// timeline ticks
+const EP=i=>[ERA4.ct[i][1],ERA4.ct[i][2]];
+const ERA_IMG={};['s0','s1','s2','s3','s4'].forEach(k=>{const im=new Image();im.src='clips/mg4/era_'+k+'.jpg';ERA_IMG[k]=im;});
+const MASK=document.createElement('canvas');MASK.width=1920;MASK.height=1080;const mctx=MASK.getContext('2d');
+{let prevKeys=new Set(),prevNodes=new Set();
+ const seoul=ERA4.ct.findIndex(c=>c[0]==='서울');
+ const kmpp=325/Math.hypot(EP(seoul)[0]-EP(ERA4.ct.findIndex(c=>c[0]==='부산'))[0],EP(seoul)[1]-EP(ERA4.ct.findIndex(c=>c[0]==='부산'))[1]);
+ ERAS.forEach((E,k)=>{const nets=ERA4.nets[E.st];
+  const seeds=prevNodes.size?[...prevNodes]:[seoul];const dep=bfsOrder(nets,seeds);const maxD=Math.max(1,...Object.values(dep));
+  E.segs=[];const seen=new Set();
+  nets.forEach(l=>{for(let q=0;q<l.s.length-1;q++){let a=l.s[q],b=l.s[q+1];const kk=kkey(a,b);if(prevKeys.has(kk)||seen.has(kk))continue;seen.add(kk);
+    if((dep[a]??99)>(dep[b]??99))[a,b]=[b,a];
+    const A=EP(a),B=EP(b),L=Math.hypot(B[0]-A[0],B[1]-A[1]);
+    const span=Math.min(1.5,(E.t1-E.t0)*.62),s0=E.t0+.04+((dep[a]??maxD)/maxD)*span,dur=.13+Math.min(.12,L/2400);
+    E.segs.push({A,B,L,w:revealWidth(L),s0,dur});}});
+  E.nodes=new Set(nets.flatMap(l=>l.s));E.lines=nets.filter(l=>l.s.length>1).length;
+  const allK=new Set();nets.forEach(l=>{for(let q=0;q<l.s.length-1;q++)allK.add(kkey(l.s[q],l.s[q+1]));});
+  E.km=0;allK.forEach(x=>{const [a,b]=x.split('_').map(Number);E.km+=Math.hypot(EP(a)[0]-EP(b)[0],EP(a)[1]-EP(b)[1])*kmpp*1.18;});
+  prevKeys=new Set([...prevKeys,...allK]);prevNodes=new Set([...prevNodes,...E.nodes]);});}
+function stageDraw(ctx,img,segs,t,full){ // draw img through a mask made of swept strokes
+ mctx.globalCompositeOperation='source-over';mctx.clearRect(0,0,1920,1080);mctx.lineCap='round';mctx.strokeStyle='#fff';let any=false;
+ segs.forEach(s=>{const v=eout(lin(t,s.s0,s.s0+s.dur));if(v<=0)return;any=true;mctx.lineWidth=s.w;mctx.beginPath();
+  mctx.moveTo(s.A[0],s.A[1]);mctx.lineTo(s.A[0]+(s.B[0]-s.A[0])*v,s.A[1]+(s.B[1]-s.A[1])*v);mctx.stroke();});
+ if(full>0){mctx.globalAlpha=full;mctx.fillStyle='#fff';mctx.fillRect(0,0,1920,1080);mctx.globalAlpha=1;any=true;}
+ if(!any)return;mctx.globalCompositeOperation='source-in';mctx.drawImage(img,0,0,1920,1080);mctx.globalCompositeOperation='source-over';ctx.drawImage(MASK,0,0);}
 [1960,1975,1990,2005,2030].forEach(y=>{const s=document.createElement('span');s.textContent=y;s.style.left=((y-1960)/70*100)+'%';document.querySelector('#era .tl').appendChild(s);});
 function eraRender(t){
- const o=fade(t,25.2,33.6,0,.35);$('era').style.opacity=o;if(!o)return;
- let E=ERAS[0];ERAS.forEach(e=>{if(t>=e.t0)E=e;});
- const yr=Math.min(E.y1,Math.floor(E.y0+(E.y1-E.y0)*lin(t,E.t0,E.t1-.1)));
- document.querySelector('#era .yr').textContent=yr;
+ const o=fade(t,25.2,31.2,0,.35);$('era').style.opacity=o;if(!o)return;
+ let k=0;ERAS.forEach((e,i)=>{if(t>=e.t0)k=i;});const E=ERAS[k];
+ const ctx=$('eraCv').getContext('2d');ctx.drawImage(ERA_IMG.s0,0,0,1920,1080);
+ ERAS.forEach(e=>{if(t<e.t0-.01)return;stageDraw(ctx,ERA_IMG[e.st],e.segs,t,sm(lin(t,e.t1-.32,e.t1-.12)));});
+ // punch-in at every chapter, flash, slam the year
+ const pk=lin(t,E.t0,E.t0+.45);$('eraCv').style.transform='scale('+(1+.045*(1-eout(pk)))+')';
+ document.querySelector('#era .flash').style.opacity=.35*(1-eout(lin(t,E.t0,E.t0+.22)))*(k>0?1:.6);
+ const ry=eout5(lin(t,E.t0+.02,Math.min(E.t1-.2,E.t0+1.6)));const yr=Math.round(E.y0+(E.y1-E.y0)*ry);
+ const Y=document.querySelector('#era .yr');Y.textContent=yr;const sk=lin(t,E.t0,E.t0+.25);Y.style.transform='scale('+(1+.22*(1-eout(sk)))+')';
  const hd=document.querySelector('#era .hd');hd.children[0].textContent=E.tag;hd.children[1].textContent=E.title;hd.children[2].textContent=E.desc;
- const hk=sm(lin(t,E.t0,E.t0+.3));hd.style.opacity=hk;hd.style.transform='translateY('+((1-hk)*10)+'px)';
- document.querySelector('#era .tl .fill').style.width=((yr+lin(t,E.t0,E.t1)*0-1960)/70*100)+'%';
- let km=0,lines=new Set(),sts=0;
- ERA_RUNS.forEach(r=>{const k=lin(t,r.s0,r.s0+r.dur),e=eout(k);const off=r.L*(1-e);
-  r.el.setAttribute('stroke-dashoffset',off);r.glow.setAttribute('stroke-dashoffset',off);
-  const live=k>0&&k<1;r.head.setAttribute('opacity',live?1:(k>=1?Math.max(0,1-(t-r.s0-r.dur)/.25):0));
-  const hp=at(r.pts,r.L*e);r.head.setAttribute('cx',hp[0]);r.head.setAttribute('cy',hp[1]);
-  if(k>0){km+=r.L*e*kmpp;lines.add(r.n);}});
- for(const s in ERA_ST){const S=ERA_ST[s],v=sm(lin(t,S.t,S.t+.12));S.c.setAttribute('opacity',v);if(S.lab)S.lab.setAttribute('opacity',v*.9);if(v>.5)sts++;}
- document.querySelector('#era .st').innerHTML='노선<b>'+lines.size+'</b><br>역<b>'+sts+'</b><br>선로<b>'+Math.round(km).toLocaleString()+'</b>km';
+ const hk=eout(lin(t,E.t0,E.t0+.25));hd.style.opacity=hk;hd.style.transform='translateX('+((1-hk)*-30)+'px)';
+ document.querySelector('#era .tl .fill').style.width=((yr-1960)/70*100)+'%';
+ const pv=k?ERAS[k-1]:{lines:0,km:0,nodes:new Set()};const r=E.segs.length?E.segs.reduce((a,x)=>a+eout(lin(t,x.s0,x.s0+x.dur)),0)/E.segs.length:1;
+ const nl=Math.round(pv.lines+(E.lines-pv.lines)*r),ns=Math.round(pv.nodes.size+(E.nodes.size-pv.nodes.size)*r),nk=Math.round(pv.km+(E.km-pv.km)*r);
+ document.querySelector('#era .st').innerHTML='노선<b>'+nl+'</b><br>역<b>'+ns+'</b><br>선로<b>'+nk.toLocaleString()+'</b>km';
 }
 
-// ---------- finale: the network grows out of Seoul, then lines assemble the ER mark ----------
-const XN=MG.nets.x,SEOUL=CTX.findIndex(c=>c[0]==='서울');
-const segs={},adj={};
-XN.forEach(l=>{for(let q=0;q<l.s.length-1;q++){const a=l.s[q],b=l.s[q+1],k=kkey(a,b);if(!segs[k])segs[k]={a,b,c:l.c};(adj[a]=adj[a]||[]).push(b);(adj[b]=adj[b]||[]).push(a);}});
-const dist={};dist[SEOUL]=0;{const Q=[SEOUL];while(Q.length){const u=Q.shift();(adj[u]||[]).forEach(v=>{if(dist[v]==null){dist[v]=dist[u]+1;Q.push(v);}});}}
-const maxD=Math.max(...Object.values(dist));
-const FSEG=Object.values(segs).map(s=>{let a=s.a,b=s.b;if((dist[a]??99)>(dist[b]??99))[a,b]=[b,a];const pts=octi(a,b),L=plen(pts);
- const d=dist[a]??maxD;const s0=38.5+(d/maxD)*1.65,dur=.32;
- const els=[['fnHalo','#DDE2E9',9],['fnWhite','#fff',6.6],['fnCol',s.c,4]].map(([g,c,w])=>{const e=mk('path',{d:pd(pts),fill:'none',stroke:c,'stroke-width':w,'stroke-linecap':'round','stroke-linejoin':'round','stroke-dasharray':L+' '+(L+10),'stroke-dashoffset':L},$(g));return e;});
- return {a,b,L,s0,dur,els};});
-const FST={};FSEG.forEach(s=>{[[s.a,s.s0],[s.b,s.s0+s.dur]].forEach(([i,tt])=>{if(FST[i]==null||FST[i].t>tt)FST[i]={t:tt};});});
-for(const i in FST){FST[i].el=mk('circle',{cx:P(i)[0],cy:P(i)[1],r:3.4,fill:'#fff',stroke:'#2B2F36','stroke-width':1.5,opacity:0},$('fnSt'));}
-// ER mark in the logo's own units (1024 grid): stroke 39, white gap to 59, grey halo to 80
+// ---------- ending part 1: the 2030 network bursts out of Seoul on the game's map ----------
+const G0=36.0,GN=66;
+const gSegs=[];{const net=END4.net;
+ const sIdx=ERA4.ct.findIndex(c=>c[0]==='서울');const dep=bfsOrder(net,[sIdx]);const maxD=Math.max(...Object.values(dep));const seen=new Set();
+ net.forEach(l=>{for(let q=0;q<l.s.length-1;q++){let a=l.s[q],b=l.s[q+1];const kk=kkey(a,b);if(seen.has(kk))continue;seen.add(kk);if((dep[a]??99)>(dep[b]??99))[a,b]=[b,a];
+   gSegs.push({a,b,s0:G0+.12+((dep[a]??maxD)/maxD)*1.05,dur:.14});}});}
+function gScr(i,c){const p=END4.pos[i];return [(p[0]*c.ms*c.sc+c.px)*1.5,(p[1]*c.ms*c.sc+c.py)*1.5];}
+function growRender(t){
+ const o=(t>=G0&&t<38.0)?1:0;$('grow').style.opacity=o;if(!o)return;
+ const i=Math.min(GN-1,Math.floor((t-G0)*FPS)),c=END4.cams[i];
+ setSrc($('gA'),fr('endA',i));setSrc($('gB'),fr('endB',i));
+ const segs=gSegs.map(s=>{const A=gScr(s.a,c),B=gScr(s.b,c),L=Math.hypot(B[0]-A[0],B[1]-A[1]);return {A,B,L,w:revealWidth(L),s0:s.s0,dur:s.dur};});
+ GROW.push(()=>{const ctx=$('growCv').getContext('2d');ctx.drawImage($('gA'),0,0,1920,1080);stageDraw(ctx,$('gB'),segs,t,sm(lin(t,37.25,37.45)));});
+}
+const GROW=[];
+// ---------- ending part 2: lines assemble the ER mark (logo units, 1024 grid) ----------
 const ERP=[
- {c:'#2F80ED',d:'M437,178 H269 A128,128 0 0 0 141,306 V717 A128,128 0 0 0 269,845 H437',t0:41.0,t1:41.85},
- {c:'#EF6B54',d:'M610,845 V306 A128,128 0 0 1 738,178 H815 A128,128 0 0 1 943,306 V365 A128,128 0 0 1 815,493 H640',t0:41.12,t1:41.98},
- {c:'#E0A82E',d:'M204,543 H437',t0:41.45,t1:41.9},
- {c:'#1F9367',d:'M672,555 H803 A128,128 0 0 1 931,683 V845',t0:41.5,t1:42.0},
+ {c:'#2F80ED',d:'M437,178 H269 A128,128 0 0 0 141,306 V717 A128,128 0 0 0 269,845 H437',t0:37.95,t1:38.62},
+ {c:'#EF6B54',d:'M610,845 V306 A128,128 0 0 1 738,178 H815 A128,128 0 0 1 943,306 V365 A128,128 0 0 1 815,493 H640',t0:38.05,t1:38.72},
+ {c:'#E0A82E',d:'M204,543 H437',t0:38.3,t1:38.62},
+ {c:'#1F9367',d:'M672,555 H803 A128,128 0 0 1 931,683 V845',t0:38.35,t1:38.72},
 ];
-const PILLS=[{cx:173,cy:511.5,d1:[142,480,'#2F80ED'],d2:[204,543,'#E0A82E'],t:42.05},{cx:641.5,cy:523.5,d1:[610,492,'#EF6B54'],d2:[673,555,'#1F9367'],t:42.15}];
+const PILLS=[{cx:173,cy:511.5,d1:[142,480,'#2F80ED'],d2:[204,543,'#E0A82E'],t:38.76},{cx:641.5,cy:523.5,d1:[610,492,'#EF6B54'],d2:[673,555,'#1F9367'],t:38.86}];
 const erG=$('er');const erIn=mk('g',{},erG);
 ERP.forEach(p=>{p.els=[['#DDE2E9',80],['#fff',59],[p.c,39]].map(([c,w])=>mk('path',{d:p.d,fill:'none',stroke:c,'stroke-width':w,'stroke-linecap':'round','stroke-linejoin':'round'},erIn));
  p.L=p.els[0].getTotalLength();p.els.forEach(e=>{e.setAttribute('stroke-dasharray',p.L+' '+(p.L+200));e.setAttribute('stroke-dashoffset',p.L);});});
 PILLS.forEach(q=>{q.g=mk('g',{opacity:0},erIn);const r=70.5,s=44;
  mk('rect',{x:-s-r,y:-r,width:2*s+2*r,height:2*r,rx:r,fill:'#fff',stroke:'#000','stroke-width':26},q.g);
- q.g.dataset.t=q.t;
  [q.d1,q.d2].forEach(([x,y,c])=>{const dx=x-q.cx,dy=y-q.cy,c45=Math.SQRT1_2,lx=dx*c45+dy*c45,ly=-dx*c45+dy*c45;mk('circle',{cx:lx,cy:ly,r:29,fill:c},q.g);});});
 const wmEl=document.querySelector('#fin .wordmark'),relEl=document.querySelector('#fin .rel');
-// layout: assembly at centre, then the mark slides left of the wordmark (v8 ending)
-const ER_W=904,ER_CX=510,ER_CY=511.5;   // mark centre in logo units (x 58–962, y 159–864)
-const WM_H=232,WM_W=WM_H*1386/448,MARK_S1=.30,GAP=56;
+const ER_W=904,ER_CX=510,ER_CY=511.5,WM_H=232,WM_W=WM_H*1386/448,MARK_S1=.30,GAP=56;
 const totalW=ER_W*MARK_S1+GAP+WM_W,X0=(1920-totalW)/2,Y0=470;
 wmEl.style.width=WM_W+'px';wmEl.style.left=(X0+ER_W*MARK_S1+GAP)+'px';wmEl.style.top=(Y0-WM_H/2)+'px';
 relEl.style.left=(X0+ER_W*MARK_S1+GAP+10)+'px';relEl.style.top=(Y0+WM_H/2+34)+'px';
 function finRender(t){
- const o=t>=38.4?1:0;$('fin').style.opacity=o;if(!o)return;
- // network grows out of Seoul; camera pulls back from Seoul to the whole country
- const cz=eio(lin(t,38.4,40.7)),sc=2.7+(1-2.7)*cz,sx=P(SEOUL)[0],sy=P(SEOUL)[1];
- const tx=960-sx*sc+(1180-960+ (sx-1180))*0*cz, ty=540-sy*sc;
- const fx=(1-cz)*(960-sx*sc)+cz*(0),fy=(1-cz)*(540-sy*sc)+cz*(0);
- const netOut=sm(lin(t,40.9,41.5));
- const net=$('finNet');net.setAttribute('transform','translate('+fx+','+fy+') scale('+sc+')');net.setAttribute('opacity',1-netOut);
- document.querySelector('#fin .dots').style.transform='translate('+fx+'px,'+fy+'px) scale('+sc+')';document.querySelector('#fin .dots').style.opacity=1-netOut*.85;
- FSEG.forEach(s=>{const k=eout(lin(t,s.s0,s.s0+s.dur));s.els.forEach(e=>e.setAttribute('stroke-dashoffset',s.L*(1-k)));});
- for(const i in FST){FST[i].el.setAttribute('opacity',sm(lin(t,FST[i].t,FST[i].t+.1)));}
- // ER assembly
+ const o=sm(lin(t,37.5,37.95));$('fin').style.opacity=o;if(!o)return;
  ERP.forEach(p=>{const k=eio(lin(t,p.t0,p.t1));p.els.forEach(e=>e.setAttribute('stroke-dashoffset',p.L*(1-k)));});
- PILLS.forEach(q=>{const k=lin(t,q.t,q.t+.32),s=k<=0?0:back(k);q.g.setAttribute('opacity',k>0?1:0);
+ PILLS.forEach(q=>{const k=lin(t,q.t,q.t+.3),s=k<=0?0:back(k);q.g.setAttribute('opacity',k>0?1:0);
    q.g.setAttribute('transform','translate('+q.cx+','+q.cy+') rotate(45) scale('+s+')');});
- // mark: centred big (scale .78) → shrinks to the left of the wordmark
- const mv=eio(lin(t,42.6,43.35));
- const s0=.78,s1=MARK_S1,s=s0+(s1-s0)*mv;
- const cx=960+((X0+ER_W*s1/2)-960)*mv,cy=540+(Y0-540)*mv;
- erG.setAttribute('transform','translate('+(cx-ER_CX*s)+','+(cy-ER_CY*s)+') scale('+s+')');
- const wk=sm(lin(t,43.0,43.6));wmEl.style.opacity=wk;wmEl.style.transform='translateX('+((1-wk)*-24)+'px)';
- const rk=sm(lin(t,43.6,44.1));relEl.style.opacity=rk;relEl.style.transform='translateY('+((1-rk)*10)+'px)';
+ const mv=eio(lin(t,39.35,40.05)),s0=.78,s1=MARK_S1,s=s0+(s1-s0)*mv;
+ const pop=1+.05*Math.sin(Math.PI*lin(t,38.86,39.2));
+ const cx=960+((X0+ER_W*s1/2)-960)*mv,cy=540+(Y0-540)*mv,S=s*pop;
+ erG.setAttribute('transform','translate('+(cx-ER_CX*S)+','+(cy-ER_CY*S)+') scale('+S+')');
+ const wk=sm(lin(t,39.75,40.3));wmEl.style.opacity=wk;wmEl.style.transform='translateX('+((1-wk)*-24)+'px)';
+ const rk=sm(lin(t,40.3,40.8));relEl.style.opacity=rk;relEl.style.transform='translateY('+((1-rk)*10)+'px)';
 }
 
-async function render(t){
+// external clock -> internal timeline: the 2030 chapter plays 1.5x faster and everything after it moves up 0.9 s
+const WARP=t=>t<28.5?t:(t<30.3?28.5+(t-28.5)*1.5:t+0.9);
+async function render(tExt){
+ const t=WARP(tExt);
  waits.length=0;
  SHOTS.forEach((s,i)=>{const el=shotEls[i];const o=fade(t,s.t0,s.t1,s.fi,s.fo);el.style.opacity=o;if(!o)return;
   const src=fr(s.c,s.f0+Math.floor((t-s.t0)*FPS+1e-6));const f=el.querySelector('img.f'),g=el.querySelector('img.glow');setSrc(f,src);
@@ -305,30 +291,31 @@ async function render(t){
  GHOSTS.forEach((g,i)=>{const el=ghostEls[i];const o=fade(t,g.t0,g.t1,.6,.5)*g.op;el.style.opacity=o;if(!o)return;
   const src=fr(g.c,g.f0+Math.floor((t-g.t0)*FPS));el.querySelectorAll('img').forEach(im=>setSrc(im,src));
   el.style.filter='blur(.5px)';el.style.transform='scale('+(1.0+.015*lin(t,g.t0,g.t1))+')';});
- // opening: publisher card on black, then the night map fades up under the ER mark (steady dim, no pumping)
- $('black').style.opacity=sm(lin(t,45.0,45.6));
+ $('black').style.opacity=sm(lin(t,42.0,42.6));
  const mg=sm(lin(t,.5,1.3))*(1-sm(lin(t,2.7,3.3)));$('mg').style.opacity=mg;$('mg').style.transform='translate(-50%,-50%) scale('+(0.97+0.03*lin(t,.5,3.3))+')';
  const ei=sm(lin(t,4.6,5.3))*(1-sm(lin(t,7.1,7.7)));$('eri').style.opacity=ei;$('eri').style.transform='translate(-50%,-50%) scale('+(0.94+0.06*eout(lin(t,4.6,7.7)))+')';
  const dim=1-.36*(1-sm(lin(t,7.2,7.9)));shotEls[0].querySelector('img.f').style.filter+=' brightness('+dim+')';
  $('top').style.opacity=.9*sm(lin(t,4.0,4.6))*(1-sm(lin(t,6.8,7.4)));
- // captions
  const line=NOTEXT?null:TEXT.find(L=>t>=L.w[0][1]&&t<L.t1),tx=$('txt');
  tx.className=line&&line.cls?line.cls:'';
  if(!line)tx.innerHTML='';
  else{const out=line.cut?1:1-sm(lin(t,line.t1-.45,line.t1));
-  tx.innerHTML=line.w.map(([w,a])=>{const k=sm(lin(t,a,a+.55)),c=line.ink?Math.round(150-118*sm(lin(t,a+.15,a+.7))):Math.round(150+105*sm(lin(t,a+.15,a+.7)));
+  tx.innerHTML=line.w.map(([w,a])=>{const k=sm(lin(t,a,a+.45)),c=line.ink?Math.round(150-118*sm(lin(t,a+.1,a+.55))):Math.round(150+105*sm(lin(t,a+.15,a+.7)));
    return '<span style="opacity:'+(k*out)+';filter:blur('+((1-k)*9)+'px);transform:translateY('+((1-k)*14)+'px);color:rgb('+c+','+c+','+(c+(line.ink?6:0))+')">'+w+'</span>';}).join('');
   tx.style.fontSize=(line.w[0][0].length>9?70:76)+'px';}
  const bright=(t>=12&&t<25.2);$('scrim').style.opacity=(line&&bright)?1:0;
  eraRender(t);
- FEAT.forEach((f,i)=>{const el=featEls[i],o=fade(t,f.t0,f.t1,.28,.22);el.style.opacity=o;f.labEl.style.opacity=o;if(!o)return;const k=lin(t,f.t0,f.t1);
+ FEAT.forEach((f,i)=>{const el=featEls[i],o=fade(t,f.t0,f.t1+(i<FEAT.length-1?.08:0),.12,.1);el.style.opacity=o;f.labEl.style.opacity=o;if(!o)return;const k=lin(t,f.t0,f.t1);
   const im=el.querySelector('img');setSrc(im,fr(f.c,6+Math.floor((t-f.t0)*FPS)));
   if(f.scroll)im.style.transform='translateY('+(-k*Math.max(0,f.rh-f.hh)*.55)+'px)';
   el.style.transform='translate(-50%,-50%) rotateY('+(-9+6*k)+'deg) rotateX(3deg) scale('+(0.95+0.06*k)+')';
   f.labEl.style.transform='translateY('+((1-sm(lin(t,f.t0,f.t0+.4)))*16)+'px)';});
- $('wm').style.opacity=.85*sm(lin(t,7.8,8.4))*(1-sm(lin(t,37.9,38.4)))*(t>=25.2&&t<33.6?0:1);
+ $('wm').style.opacity=.85*sm(lin(t,7.8,8.4))*(1-sm(lin(t,35.6,36.0)))*(t>=25.2&&t<31.2?0:1);
+ growRender(t);
  finRender(t);
  await Promise.all(waits);
+ while(GROW.length)GROW.shift()();
 }
-window.render=render;window.DURATION=DUR;
+window.render=render;window.DURATION=DUR-0.9;
+window.READY=Promise.all(Object.values(ERA_IMG).map(im=>im.decode()));
 </script></body></html>

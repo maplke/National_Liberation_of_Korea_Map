@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 SR = 48000
-DUR = 45.6
+DUR = 41.7   # output length; event times below are on the 42.6 s internal timeline (see warp)
 BEAT = 0.6
 N = int(SR * DUR)
 L = np.zeros(N)
@@ -16,7 +16,17 @@ def mtof(m):
     return 440.0 * 2 ** ((m - 69) / 12)
 
 
+def warp(t):
+    # internal -> output time: the 2030 chapter (28.5-31.2) runs 1.5x faster, everything after moves up 0.9 s
+    if t < 28.5:
+        return t
+    if t < 31.2:
+        return 28.5 + (t - 28.5) / 1.5
+    return t - 0.9
+
+
 def add(sig, t, pan=0.0, gain=1.0):
+    t = warp(t)
     i = int(t * SR)
     if i >= N:
         return
@@ -158,7 +168,7 @@ def chord_at(t):
 
 
 # pads through the whole piece (v3 timeline)
-END = 42.1  # ER mark completes
+END = 38.85  # ER mark completes
 for b in range(int(DUR / BAR) + 1):
     t0 = b * BAR
     if t0 >= END:
@@ -241,40 +251,45 @@ for t in np.arange(21.6, 25.2 - 1e-6, BAR):
 add(riser(2.0), 23.2, gain=.5)
 add(swell(1.2), 24.0, gain=.8)
 
-# 25.2 - 33.6: era graphic groove; a hit and a sweep at each new chapter
-groove(25.2, 33.6)
-for t in (25.2, 27.3, 29.4, 31.5):
-    add(boom(.5, 1.8), t)
-    add(swell(.5, hp=4000), t - .5, gain=.45)
-    add(bell(86, 1.5), t, gain=.14)
+# 25.2 - 31.2: era graphic — four fast chapters, a slam on each
+groove(25.2, 31.2, kick_g=1.0, snare_g=.9, sub_g=.9, arp_g=.28, bright=1.4)
+for t in (25.2, 26.7, 27.6, 28.5):
+    add(boom(.7, 1.6), t)
+    add(swell(.4, hp=4000), t - .4, gain=.5)
+    add(bell(86, 1.2), t, gain=.16)
+    for k, u in enumerate(np.arange(t + .05, t + (1.5 if t == 28.5 else .8), .075)):   # network rattles out
+        add(hat(), u, pan=(.45 if k % 2 else -.45), gain=.45)
 
-# 33.6 - 38.4: four feature windows
-groove(33.6, 38.4, kick_g=.8, snare_g=.6, sub_g=.8, arp_g=.24, bright=1.2)
-for t in (33.6, 34.8, 36.0, 37.2):
+# 31.2 - 36.0: four feature windows
+groove(31.2, 36.0, kick_g=.8, snare_g=.6, sub_g=.8, arp_g=.24, bright=1.2)
+for t in (31.2, 32.4, 33.6, 34.8):
     add(boom(.45, 1.4), t)
     add(bell(chord_at(t)[2][2] + 12, 1.2), t, gain=.15)
-add(swell(.6), 37.8, gain=.7)
+add(swell(.6), 35.4, gain=.7)
 
-# 38.4 - 41.0: network grows out of Seoul — airy, rising
-add(boom(.6, 3.0), 38.4)
-arps(38.4, 41.0, .24, .9)
-add(riser(1.8), 39.2, gain=.5)
-add(swell(1.0), 40.0, gain=.8)
+# 36.0 - 37.9: the 2030 network bursts out of Seoul
+add(boom(.8, 2.5), 36.0)
+arps(36.0, 37.9, .26, 1.2)
+for k, u in enumerate(np.arange(36.1, 37.3, .06)):
+    add(hat(), u, pan=(.5 if k % 2 else -.5), gain=.4)
+add(riser(1.6), 36.3, gain=.55)
+add(swell(.8), 37.15, gain=.8)
 
-# 41.0 - 42.1: lines assemble the mark — a whoosh per stroke, pops for the pills
-for t in (41.0, 41.12, 41.45, 41.5):
+# 37.95 - 38.85: lines assemble the mark — a whoosh per stroke, pops for the pills
+for t in (37.95, 38.05, 38.3, 38.35):
     add(swell(.25, hp=3000), t, gain=.35)
     add(pluck(86, .6, 1.4), t + .2, gain=.12)
-for t in (42.05, 42.15):
+for t in (38.76, 38.86):
     add(pluck(93, .5, 1.6), t, gain=.25)
 
-# 42.1: the mark is complete — final hit and ring-out
+# 38.85: the mark is complete — final hit and ring-out
+END = 38.85
 add(boom(1.0, 4.0), END)
-for m, g in ((50, .5), (57, .4), (62, .4), (66, .35), (69, .3), (74, .25)):
-    add(pad([m], 2.6, att=.02, rel=1.6), END, gain=g * .9)
+for m_, g in ((50, .5), (57, .4), (62, .4), (66, .35), (69, .3), (74, .25)):
+    add(pad([m_], 2.6, att=.02, rel=1.6), END, gain=g * .9)
 add(bell(74, 4) + bell(81, 4) * .6 + bell(86, 4) * .4, END + .1, gain=.32)
-add(bell(78, 3), 43.0, gain=.16)
-add(bell(86, 3), 43.6, gain=.12)
+add(bell(78, 3), 39.75, gain=.16)
+add(bell(86, 3), 40.3, gain=.12)
 
 # ---------- reverb (FFT convolution with synthetic IR) ----------
 def reverb(x, secs=2.6, mix=.28, seed=1):
