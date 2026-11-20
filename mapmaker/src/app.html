@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Everyline 맵 제작기</title>
+<style>
+:root{
+ --bg:#f3f4f2;--panel:#ffffff;--panel2:#f7f8f6;--line:#d9dcd6;--line2:#c3c7bf;
+ --ink:#1d211c;--ink2:#5b6158;--ink3:#8a9086;--acc:#1f7a4d;--acc2:#e7f3ec;--warn:#b26a00;--bad:#c23b2a;--ok:#1f7a4d;
+ --sea:#96c0ea;--mapbg:#dfe6ec;--sel:#e0a020;
+ --font:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+ --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#151815;--panel:#1d211d;--panel2:#242924;--line:#323831;--line2:#454c44;
+ --ink:#e6eae4;--ink2:#a9b0a6;--ink3:#7c847a;--acc:#5cc98e;--acc2:#1f3328;--warn:#e0a020;--bad:#ff6a4a;--ok:#5cc98e;--mapbg:#0f1310;--sel:#ffc23d;}}
+:root[data-theme="dark"]{
+ --bg:#151815;--panel:#1d211d;--panel2:#242924;--line:#323831;--line2:#454c44;
+ --ink:#e6eae4;--ink2:#a9b0a6;--ink3:#7c847a;--acc:#5cc98e;--acc2:#1f3328;--warn:#e0a020;--bad:#ff6a4a;--ok:#5cc98e;--mapbg:#0f1310;--sel:#ffc23d;}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:13px/1.5 var(--font)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh;height:100dvh}
+header{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+header h1{font-size:15px;margin:0 8px 0 0;font-weight:700;white-space:nowrap}
+header h1 small{font-weight:400;color:var(--ink3);margin-left:6px;font-size:11px}
+header .sp{flex:1}
+.btn{border:1px solid var(--line2);background:var(--panel2);border-radius:6px;padding:4px 10px;line-height:1.4;white-space:nowrap}
+.btn:hover{border-color:var(--acc)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.sm{padding:2px 7px;font-size:12px}
+.btn.on{background:var(--acc2);border-color:var(--acc);color:var(--acc);font-weight:600}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.bad{color:var(--bad)}
+.badge{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;font-size:11px;text-align:center;background:var(--bad);color:#fff;margin-left:4px}
+.badge.ok{background:var(--ok)}
+.main{display:grid;grid-template-columns:minmax(220px,270px) 1fr minmax(270px,340px);min-height:0}
+.left,.right{background:var(--panel);overflow:auto;min-height:0}
+.left{border-right:1px solid var(--line)}
+.right{border-left:1px solid var(--line)}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;padding:8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:2}
+.tabs button{flex:1 1 30%;border:1px solid var(--line);background:var(--panel2);border-radius:6px;padding:5px 4px;font-size:12px}
+.tabs button.on{background:var(--acc2);border-color:var(--acc);color:var(--acc);font-weight:600}
+.sec{padding:10px 12px;border-bottom:1px solid var(--line)}
+.sec h3{margin:0 0 8px;font-size:12px;color:var(--ink2);font-weight:700;letter-spacing:.02em}
+.sec p.hint,.hint{color:var(--ink3);font-size:12px;margin:4px 0}
+.lst{list-style:none;margin:0;padding:0}
+.li{display:flex;align-items:center;gap:6px;padding:5px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.li:hover{background:var(--panel2)}
+.li.on{background:var(--acc2)}
+.li .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li .meta{color:var(--ink3);font-size:11px;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.25)}
+.row{display:flex;align-items:center;gap:6px;margin:5px 0;flex-wrap:wrap}
+.row>label{flex:0 0 92px;color:var(--ink2);font-size:12px}
+.row>.f{flex:1;min-width:0}
+input[type=text],input[type=number],select,textarea{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:5px;padding:4px 6px}
+input[type=number]{font-family:var(--mono)}
+textarea{font-family:var(--mono);font-size:12px;resize:vertical;min-height:60px}
+input[type=checkbox]{accent-color:var(--acc)}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.chk{display:flex;align-items:center;gap:6px;margin:4px 0;font-size:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
+.grid2 .row>label{flex-basis:auto;min-width:46px}
+.center{position:relative;min-width:0;min-height:0;background:var(--mapbg);overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.toolbar{position:absolute;left:8px;top:8px;display:flex;gap:4px;flex-wrap:wrap;max-width:calc(100% - 16px);z-index:3}
+.toolbar .btn{background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.status{position:absolute;left:8px;bottom:8px;right:8px;display:flex;gap:10px;font-size:11px;color:var(--ink2);pointer-events:none;z-index:3}
+.status span{background:var(--panel);padding:2px 7px;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.sw{display:inline-block;width:22px;height:22px;border-radius:4px;border:2px solid var(--line2);vertical-align:middle;cursor:pointer}
+.sw.on{border-color:var(--sel);box-shadow:0 0 0 2px var(--sel)}
+.msg{padding:6px 8px;border-radius:5px;margin:4px 0;font-size:12px;line-height:1.45}
+.msg.bad{background:color-mix(in srgb,var(--bad) 12%,transparent);color:var(--bad)}
+.msg.warn{background:color-mix(in srgb,var(--warn) 14%,transparent);color:var(--warn)}
+.msg.ok{background:color-mix(in srgb,var(--ok) 12%,transparent);color:var(--ok)}
+.goal{border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin:6px 0;background:var(--panel2)}
+.kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line2);border-radius:3px;padding:0 4px;background:var(--panel2)}
+.dlg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.dlg .box{background:var(--panel);border-radius:10px;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.dlg h2{margin:0 0 10px;font-size:16px}
+.opt{border:1px solid var(--line);border-radius:8px;padding:10px;margin:6px 0;cursor:pointer;background:var(--panel2)}
+.opt:hover,.opt.on{border-color:var(--acc)}
+.opt b{display:block}
+.opt span{color:var(--ink3);font-size:12px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:7px 14px;border-radius:6px;z-index:60;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.tag{display:inline-block;font-size:11px;padding:0 6px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);color:var(--ink2);margin:1px}
+code{font-family:var(--mono);font-size:11.5px;background:var(--panel2);padding:0 3px;border-radius:3px}
+@media (max-width:900px){
+ .main{grid-template-columns:1fr;grid-template-rows:auto 55vh auto}
+ .left,.right{border:none;max-height:none}
+ .left{order:1}.center{order:2}.right{order:3}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <h1>Everyline 맵 제작기<small id="hVer"></small></h1>
+ <button class="btn" id="bNew">새 지도</button>
+ <button class="btn" id="bOpen">열기</button>
+ <button class="btn" id="bUndo" title="되돌리기 (Ctrl+Z)">↶</button>
+ <button class="btn" id="bRedo" title="다시 하기 (Ctrl+Y)">↷</button>
+ <span class="sp"></span>
+ <span id="hName" class="hint"></span>
+ <button class="btn" id="bCheck">검증<span class="badge" id="hBadge">0</span></button>
+ <button class="btn pri" id="bExport">시나리오 JSON 내보내기</button>
+ <input type="file" id="fOpen" accept=".json,application/json" hidden>
+ <input type="file" id="fImg" accept="image/*" hidden>
+</header>
+<div class="main">
+ <aside class="left" id="left"></aside>
+ <section class="center">
+  <canvas id="cv"></canvas>
+  <div class="toolbar" id="toolbar"></div>
+  <div class="status"><span id="stPos">–</span><span id="stTool"></span></div>
+ </section>
+ <aside class="right" id="right"></aside>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+/*@@VALIDATOR@@*/
+</script>
+<script>
+const BASE_KR=/*@@BASE_KR@@*/null;
+const BASE_GR=/*@@BASE_GR@@*/null;
+</script>
+<script>
+(()=>{
+'use strict';
+/* =====================================================================
+   Everyline: Rail 맵 제작기
+   - 결과물은 게임의 「시나리오 파일 불러오기」가 읽는 시나리오 JSON 하나다(지시서 10-1).
+   - 내보내기 전에 게임 로더와 같은 validScen을 돌린다(10-6). 실패하면 내보내지 않는다.
+   - 기본 시나리오(한국 · 가람 지방)도 같은 방식으로 열고 저장한다(10-8). 제작기가 다루지 않는
+     필드(이벤트 · 의뢰 · 정책 · 테크트리 …)는 열었던 그대로 통과시킨다.
+   - localStorage를 쓰지 않는다(15-10). 작업은 시나리오 JSON 자체로 저장한다.
+   ===================================================================== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o));
+const r6=v=>Math.round(v*1e6)/1e6;
+const r2=v=>Math.round(v*100)/100;
+const cvs=$('#cv'),ctx=cvs.getContext('2d');
+
+// 게임 지도 이미지의 색. 게임은 파란 계열을 바다, 밝은 색을 육지, 어두운 색을 「바깥 땅」(외국 · 비활성)으로 읽는다(crtMap)
+const MAT=[
+ {id:0,nm:'바다',rgb:[150,192,234]},
+ {id:1,nm:'육지',rgb:[255,255,255]},
+ {id:2,nm:'바깥 땅',rgb:[73,73,73],hint:'국경 너머처럼 노선을 놓지 않는 땅'},
+ {id:3,nm:'얕은 바다',rgb:[201,223,244]}];
+const REGCOL=['#e4572e','#2e86ab','#a23b72','#f18f01','#3b8b5a','#6a4c93','#c9a227','#1b998b','#d1495b','#00798c','#8d6a9f','#577590'];
+const NLIST=[1,2,4,6,8],NLBL={1:'단선',2:'복선',4:'2복선',6:'3복선',8:'4복선'};
+const GRADE=['간이역','일반역','거점역','터미널'];
+const VIRT_PROJ=[0,127,157.6,0,37,212.5];   // 가람 지방과 같은 가상 투영. 지도 좌표 1 = 경도 1/157.6도, 위도 1/212.5도
+const F0_DEF=340/875;
+// 목표 지표. 게임 METRIC 중 한국 도시 이름에 묶인 둘은 새 지도에서 쓸 수 없다(지시서 1-4 거)
+const MET=[
+ ['dblRatio','주축 복선화 비율','ratio','주축(아래 「주축」)의 이웃한 두 도시 사이가 모두 복선 이상으로 이어진 비율'],
+ ['connSmall','소도시 연결 비율','ratio','「소도시」로 표시한 노드 가운데 역과 운행 노선이 있는 비율'],
+ ['pax','누적 수송','pax','챕터 시작부터 태운 승객 누계'],
+ ['hsKm','고속선 연장','km','고속 선로 총연장(km)'],
+ ['profit3','분기 흑자','money','최근 석 달 평균 손익이 흑자'],
+ ['debtRatio','부채비율','lteRatio','부채 ÷ 자산. 챕터 종료 시점 값'],
+ ['debt','부채','lteMoney','부채 총액'],
+ ['cash','현금','money','보유 현금'],
+ ['lines','노선 수','pax','개설한 노선 수(판정 종류에 유의)'],
+ ['fareLv','실질 운임 수준','lteRatio','물가 대비 운임 수준'],
+ ['metroShare','수도권 광역 분담률','ratio','서울·인천·수원 이름에 묶여 있어 새 지도에서는 쓸 수 없습니다',1],
+ ['longShare','장거리 분담률','ratio','서울–부산·대구·광주 이름에 묶여 있어 새 지도에서는 쓸 수 없습니다',1]];
+const GK=[['ratio','비율 (이상)'],['pax','수송 (이상)'],['km','km (이상)'],['money','흑자'],['lteRatio','비율 (이하)'],['lteMoney','금액 (이하)']];
+
+/* ------------------------------------------------------------------ 상태 */
+let RAW=null;         // 연 시나리오 원본. 제작기가 다루지 않는 필드는 여기서 그대로 나간다
+let E=null;           // 편집 상태
+let tab='map',tool='paint',mat=1,brush=2;
+let sel={kind:null,i:-1};        // 고른 대상
+let presetCh=1,lineEdit=-1;      // 프리셋 탭의 챕터와 편집 중인 노선
+let regPaint=0;                  // 권역 칠하기에서 고른 지역 코드
+let view={sc:1,px:0,py:0};
+let refImg=null,refOp=.5,refShow=true;
+let hover=null,dirty=false;
+const UNDO=[],REDO=[];
+
+/* ------------------------------------------------------------------ 투영 */
+function toLL(x,y){const p=E.proj;return[p[1]+(x-p[0])/p[2],p[4]-(y-p[3])/p[5]];}
+function fromLL(lo,la,p){p=p||E.proj;return[p[0]+(lo-p[1])*p[2],p[3]+(p[4]-la)*p[5]];}
+function hav(lo1,la1,lo2,la2){const R=6371,t=Math.PI/180,dl=(la2-la1)*t,dn=(lo2-lo1)*t;
+ const a=Math.sin(dl/2)**2+Math.cos(la1*t)*Math.cos(la2*t)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(a));}
+
+/* ------------------------------------------------------------------ 시나리오 → 편집 상태 */
+function blankScenario(o){
+ // 기반은 한국 시나리오의 시스템 값(시대 곡선 · 수단 · 테크트리 · 차종 · 정책 …). 한국에만 맞는 것은 비운다
+ const b=clone(BASE_KR);
+ const W=o.W,H=o.H,cs=o.cs;
+ b.id=o.id;b.ver='0.1';b.title=o.title;b.tag=o.tag||'유저 시나리오';b.desc=o.desc||'';
+ b.map={src:'',w:W*cs,h:H*cs,F0:F0_DEF,kmpp:o.kmpp,proj:VIRT_PROJ.slice(),regions:['지역 1','산간','지역 3'],mount:[],peaks:[]};
+ b.nodes=[];b.axes={gyeongbu:[]};b.events=[];b.quests=[];b.presets={};
+ // 정책 권역 표는 한국 것의 식별자(재해 · 정책 데이터가 가리킨다)를 그대로 두고 이름과 묶음만 바꾼다
+ b.policy.regs=[{id:'cap',nm:'지역 1',pv:[0]},{id:'gw',nm:'산간',pv:[1]},{id:'cc',nm:'지역 3',pv:[2]},{id:'hn',nm:'권역 4',pv:[]},{id:'dk',nm:'권역 5',pv:[]},{id:'dn',nm:'권역 6',pv:[]}];
+ // 한국 사건을 조건으로 거는 결정은 열릴 일이 없으므로 뺀다(가람 지방과 같은 처리)
+ const ok=D=>!(D.cond||[]).some(c=>c.t==='ev');const ids=new Set(b.policy.decs.filter(ok).map(D=>D.id));
+ b.policy.decs=b.policy.decs.filter(ok);b.policy.pre=(b.policy.pre||[]).map(L=>(L||[]).filter(x=>ids.has(Array.isArray(x)?x[0]:x)));
+ b.dem={kinds:[['cap','중심 도시'],['big','큰 도시'],['city','도시'],['rural','작은 마을']]};
+ b.chapters=[{y0:1960,y1:1975,cap:2200,pre:null,nm:'1챕터',opin0:80,fleet:['steam','dsl'],press:'자본 — 빈 지도에서 첫 간선을 깝니다',
+  goals:[{nm:'누적 수송',m:'pax',tgt:600,k:'pax',desc:'챕터 시작부터 지금까지 실제로 태운 승객의 누계입니다.'},
+   {nm:'부채비율 60% 이하',m:'debtRatio',tgt:.6,k:'lteRatio',desc:'부채를 자산으로 나눈 값입니다. 챕터 종료 시점의 값으로 판정합니다.'}]}];
+ delete b.hidden;delete b.tut;
+ return{raw:b,mask:new Uint8Array(W*H).fill(o.fill),W,H};
+}
+function loadScenario(raw,maskOverride){
+ RAW=clone(raw);
+ const m=RAW.map||{};
+ E={meta:{id:RAW.id||'',ver:RAW.ver||'0.1',title:RAW.title||'',tag:RAW.tag||'',desc:RAW.desc||'',hidden:!!RAW.hidden},
+  mw:m.w||600,mh:m.h||440,proj:(m.proj&&m.proj.length===6)?m.proj.slice():VIRT_PROJ.slice(),F0:m.F0||F0_DEF,kmpp:m.kmpp||.52235,
+  calib:clone(m.__calib||RAW.__calib||null),
+  regions:(m.regions||['지역 1']).slice(),mount:new Set(m.mount||[]),peaks:clone(m.peaks||[]),
+  nodes:[],axis:((RAW.axes&&RAW.axes.gyeongbu)||[]).slice(),
+  chapters:clone(RAW.chapters||[]),presets:clone(RAW.presets||{}),
+  pregs:clone((RAW.policy&&RAW.policy.regs)||[]),
+  dem:clone((RAW.dem&&RAW.dem.kinds)||[['cap','중심 도시'],['big','큰 도시'],['city','도시'],['rural','작은 마을']]),
+  bal:clone(RAW.bal||{dem:2.4,wmin:.1,cityW:1.2,small:.9,k0:.7,k1:.9}),
+  grid:null};
+ delete RAW.__calib;
+ (RAW.nodes||[]).forEach(c=>{const xy=fromLL(c[1],c[2]);
+  E.nodes.push({n:c[0],x:xy[0],y:xy[1],w:c[3],r:c[4]|0,hub:c[5]?1:0,a:clone(c[6]||{})});});
+ if(maskOverride){E.grid=maskOverride;finishLoad();return Promise.resolve();}
+ return maskFromSrc(m.src,E.mw,E.mh).then(g=>{E.grid=g;finishLoad();});
+}
+function finishLoad(){UNDO.length=0;REDO.length=0;sel={kind:null,i:-1};lineEdit=-1;presetCh=Math.min(Math.max(1,presetCh),Math.max(1,E.chapters.length-1));
+ dirty=false;fitView();renderAll();}
+function maskFromSrc(src,mw,mh){
+ return new Promise(res=>{
+  if(!src){const W=Math.round(mw/2),H=Math.round(mh/2);res({W,H,mask:new Uint8Array(W*H)});return;}
+  const im=new Image();im.onload=()=>res(maskFromImage(im,im.naturalWidth,im.naturalHeight,true));
+  im.onerror=()=>{toast('지도 이미지를 읽지 못해 빈 바다로 엽니다');const W=Math.round(mw/2),H=Math.round(mh/2);res({W,H,mask:new Uint8Array(W*H)});};
+  im.src=src;});
+}
+// 이미지 → 칸 마스크. exact면 그림 한 픽셀이 한 칸이고 팔레트에 가장 가까운 색을 고른다.
+function maskFromImage(im,W,H,exact){
+ const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
+ g.imageSmoothingEnabled=!exact;g.drawImage(im,0,0,W,H);
+ const d=g.getImageData(0,0,W,H).data,mask=new Uint8Array(W*H);
+ for(let k=0;k<W*H;k++){const i=k*4,r=d[i],gg=d[i+1],b=d[i+2],a=d[i+3];
+  if(exact){if(a<8){mask[k]=0;continue;}let best=0,bd=1e9;
+   MAT.forEach(M=>{const dd=(M.rgb[0]-r)**2+(M.rgb[1]-gg)**2+(M.rgb[2]-b)**2;if(dd<bd){bd=dd;best=M.id;}});mask[k]=best;}
+  else{const lum=r*.3+gg*.59+b*.11;   // 참고 이미지 자동 분류 · 게임의 바다 판정과 같은 규칙
+   mask[k]=(a<8||(b>r+18&&lum>110))?0:1;}}
+ return{W,H,mask};
+}
+
+/* ------------------------------------------------------------------ 편집 상태 → 시나리오 */
+function maskPNG(){const g=E.grid,c=document.createElement('canvas');c.width=g.W;c.height=g.H;
+ const x=c.getContext('2d'),id=x.createImageData(g.W,g.H);
+ for(let k=0;k<g.W*g.H;k++){const M=MAT[g.mask[k]]||MAT[0];id.data[k*4]=M.rgb[0];id.data[k*4+1]=M.rgb[1];id.data[k*4+2]=M.rgb[2];id.data[k*4+3]=255;}
+ x.putImageData(id,0,0);return c.toDataURL('image/png');}
+function nodeArr(n){const ll=toLL(n.x,n.y);const a=clone(n.a||{});
+ Object.keys(a).forEach(k=>{if(a[k]===''||a[k]==null||a[k]===false||(['small','gun','hid','sea'].includes(k)&&!a[k]))delete a[k];});
+ return[n.n,r6(ll[0]),r6(ll[1]),+n.w||0,n.r|0,n.hub?1:0,a];}
+function presetKey(i){const c=E.chapters[i];return c.pre||('p'+c.y0);}
+function buildScenario(){
+ const o=clone(RAW);delete o.__from;
+ o.id=E.meta.id.trim();o.ver=E.meta.ver.trim();o.title=E.meta.title.trim();o.tag=E.meta.tag;o.desc=E.meta.desc;
+ if(E.meta.hidden)o.hidden=true;else delete o.hidden;
+ const map=Object.assign({},o.map||{},{src:maskPNG(),w:r2(E.mw),h:r2(E.mh),F0:E.F0,kmpp:r6(E.kmpp),proj:E.proj.map(r6),
+  regions:E.regions.slice(),mount:[...E.mount].filter(nm=>E.nodes.some(n=>n.n===nm))});   // 원래 순서를 지킨다
+ if(E.peaks.length)map.peaks=E.peaks.map(p=>[Math.round(p[0]),Math.round(p[1])]);else delete map.peaks;
+ o.map=map;
+ o.nodes=E.nodes.map(nodeArr);
+ o.axes=Object.assign({},o.axes||{},{gyeongbu:E.axis.slice()});
+ o.bal=Object.assign({},o.bal||{},E.bal);
+ o.dem=Object.assign({},o.dem||{},{kinds:clone(E.dem)});
+ // 정책 권역 · pv는 지역 코드 묶음이다
+ if(o.policy)o.policy.regs=clone(E.pregs);
+ // 챕터와 프리셋. 첫 챕터는 프리셋이 없다(15-28). 다른 챕터는 자기 프리셋을 가리킨다
+ const pres={};const used=new Set();
+ o.chapters=E.chapters.map((c,i)=>{const C=clone(c);
+  if(i===0){C.pre=null;return C;}
+  let k=presetKey(i);while(used.has(k))k+='b';used.add(k);C.pre=k;
+  const P=E.presets[c.pre]||E.presets[k]||{};
+  pres[k]={gr:P.gr==null?1:P.gr,st:(P.st||[]).slice(),g0:(P.g0||[]).slice(),unl:(P.unl||[]).slice(),tk:clone(P.tk||[]),ln:clone(P.ln||[])};
+  Object.keys(P).forEach(x=>{if(!(x in pres[k]))pres[k][x]=clone(P[x]);});
+  ['g0','unl'].forEach(x=>{if(!pres[k][x].length)delete pres[k][x];});   // 빈 선택 필드는 내보내지 않는다
+  return C;});
+ o.presets=pres;
+ // 군 지역 끄기 기능은 군 노드가 있을 때만 의미가 있다
+ if(Array.isArray(o.feats)){const gun=E.nodes.filter(n=>n.a&&n.a.gun).length;
+  o.feats=o.feats.filter(f=>f.id!=='gun'||gun>0).map(f=>f.id==='gun'?Object.assign({},f,{why:'끄면 군 '+gun+'곳을 빼고 시 지역만으로 진행합니다 · 물려받는 선로는 빠진 군을 건너 곧장 이어집니다'}):f);}
+ return o;
+}
+
+/* ------------------------------------------------------------------ 검증 */
+// 1) 게임 로더의 validScen 그대로  2) 제작기 쪽 경고(게임은 읽지만 의도와 다를 수 있는 것)
+function checkAll(){
+ let S,err=[];
+ try{S=buildScenario();err=validScen(S);}catch(x){err=['시나리오를 만들지 못했습니다 · '+x.message];}
+ const warn=[];
+ if(!E)return{err,warn};
+ if(!/^[a-z0-9_\-]+$/i.test(E.meta.id||''))err.push('식별자는 영문 · 숫자 · _ · - 만 씁니다 · '+(E.meta.id||'(비어 있음)'));
+ if(['korea','garam'].includes(E.meta.id))err.push('식별자가 게임 기본 시나리오('+E.meta.id+')와 같습니다. 게임이 「이미 같은 식별자」로 거부하므로 다른 식별자를 쓰십시오');
+ E.nodes.forEach((n,i)=>{if(!String(n.n).trim())err.push((i+1)+'번 노드에 이름이 없습니다');
+  const c=cellAt(n.x,n.y);if(c!=null&&c!==1&&!(n.a&&n.a.sea))warn.push(n.n+' 노드가 육지 밖에 있습니다');});
+ if(!E.nodes.length)warn.push('노드가 없습니다');
+ const names=new Set(E.nodes.map(n=>n.n));
+ if(E.nodes.length&&E.nodes[0].a&&E.nodes[0].a.parent)warn.push('첫 노드(수도)가 서브역입니다. 수도는 수요 노드여야 합니다');
+ E.axis.forEach(nm=>{if(!names.has(nm))err.push('주축이 없는 노드를 가리킵니다 · '+nm);});
+ E.chapters.forEach((c,i)=>{
+  (c.goals||[]).forEach(g=>{const M=MET.find(x=>x[0]===g.m);
+   if(g.m==='dblRatio'&&E.axis.length<2)warn.push((i+1)+'챕터 목표 「'+g.nm+'」가 주축을 쓰는데 주축 도시가 둘 미만입니다(게임은 한국 경부축으로 대신 셉니다)');
+   if(M&&M[4])warn.push((i+1)+'챕터 목표 「'+g.nm+'」의 지표는 한국 도시 이름에 묶여 있습니다');
+   if(g.m==='connSmall'&&!E.nodes.some(n=>n.a&&n.a.small))warn.push((i+1)+'챕터 목표 「'+g.nm+'」: 「소도시」로 표시한 노드가 없어 인구 가중이 작은 노드를 대신 셉니다');});
+  if(i>0&&E.chapters[i-1].y1!==c.y0)warn.push((i+1)+'챕터 시작 연도가 앞 챕터 끝 연도와 다릅니다');
+  if(c.y1<=c.y0)err.push((i+1)+'챕터의 끝 연도가 시작 연도보다 늦어야 합니다');
+  if(i>0){const P=E.presets[c.pre]||{};
+   (P.st||[]).forEach(nm=>{if(!names.has(nm))err.push((i+1)+'챕터 프리셋의 역이 없는 노드입니다 · '+nm);});
+   (P.tk||[]).forEach(t=>{if(!names.has(t[0])||!names.has(t[1]))err.push((i+1)+'챕터 프리셋 선로가 없는 노드를 잇습니다 · '+t[0]+'–'+t[1]);});
+   const tks=new Set((P.tk||[]).map(t=>tkKey(t[0],t[1])));const sts=new Set(P.st||[]);
+   (P.ln||[]).forEach(L=>{if(!L[2]||L[2].length<2)warn.push((i+1)+'챕터 프리셋 노선 「'+L[0]+'」의 정차역이 둘 미만입니다');
+    for(let q=1;q<(L[2]||[]).length;q++)if(!tks.has(tkKey(L[2][q-1],L[2][q]))){warn.push((i+1)+'챕터 노선 「'+L[0]+'」: '+L[2][q-1]+'–'+L[2][q]+' 사이에 선로가 없습니다');break;}
+    (L[2]||[]).forEach(nm=>{if(!sts.has(nm))warn.push((i+1)+'챕터 노선 「'+L[0]+'」이 역이 없는 '+nm+'에 섭니다');});});}});
+ const codes=new Set(E.pregs.flatMap(R=>R.pv||[]));
+ E.regions.forEach((nm,i)=>{if(!codes.has(i)&&E.nodes.some(n=>n.r===i))warn.push('지역 「'+nm+'」이 어느 정책 권역에도 묶이지 않았습니다');});
+ E.nodes.forEach(n=>{if(n.r>=E.regions.length)err.push(n.n+' 노드의 지역 코드가 지역 목록 밖입니다');});
+ return{err,warn,S};
+}
+
+/* ------------------------------------------------------------------ 되돌리기 */
+function snap(){return{m:E.grid.mask.slice(),W:E.grid.W,H:E.grid.H,j:JSON.stringify({nodes:E.nodes,peaks:E.peaks,axis:E.axis,chapters:E.chapters,presets:E.presets,
+ regions:E.regions,pregs:E.pregs,mount:[...E.mount],mw:E.mw,mh:E.mh,proj:E.proj,kmpp:E.kmpp,calib:E.calib,meta:E.meta,dem:E.dem,bal:E.bal})};}
+function restore(s){E.grid={W:s.W,H:s.H,mask:s.m.slice()};const o=JSON.parse(s.j);Object.assign(E,o);E.mount=new Set(o.mount);mcache=null;}
+function push(){UNDO.push(snap());if(UNDO.length>60)UNDO.shift();REDO.length=0;dirty=true;}
+function undo(){if(!UNDO.length)return;REDO.push(snap());restore(UNDO.pop());fixSel();renderAll();}
+function redo(){if(!REDO.length)return;UNDO.push(snap());restore(REDO.pop());fixSel();renderAll();}
+function fixSel(){if(sel.kind==='node'&&!E.nodes[sel.i])sel={kind:null,i:-1};}
+
+/* ------------------------------------------------------------------ 지도 그리기 */
+let mcache=null;
+function maskCanvas(){
+ if(mcache&&mcache.W===E.grid.W&&mcache.H===E.grid.H&&!mcache.dirty)return mcache.c;
+ const g=E.grid;const c=(mcache&&mcache.W===g.W&&mcache.H===g.H)?mcache.c:document.createElement('canvas');
+ c.width=g.W;c.height=g.H;const x=c.getContext('2d'),id=x.createImageData(g.W,g.H);
+ for(let k=0;k<g.W*g.H;k++){const M=MAT[g.mask[k]]||MAT[0];id.data[k*4]=M.rgb[0];id.data[k*4+1]=M.rgb[1];id.data[k*4+2]=M.rgb[2];id.data[k*4+3]=255;}
+ x.putImageData(id,0,0);mcache={c,W:g.W,H:g.H,dirty:false};return c;}
+function cs(){return E.mw/E.grid.W;}   // 칸 하나의 지도 단위 크기
+function cellAt(x,y){const g=E.grid,cx=Math.floor(x/cs()),cy=Math.floor(y/(E.mh/g.H));
+ if(cx<0||cy<0||cx>=g.W||cy>=g.H)return null;return g.mask[cy*g.W+cx];}
+function S2M(X,Y){return[(X-view.px)/view.sc,(Y-view.py)/view.sc];}
+function M2S(x,y){return[view.px+x*view.sc,view.py+y*view.sc];}
+function fitView(){const r=cvs.getBoundingClientRect();if(!E||!E.grid||!r.width)return;
+ const pad=30,sc=Math.min((r.width-pad*2)/E.mw,(r.height-pad*2-30)/E.mh);
+ view.sc=Math.max(.05,sc);view.px=(r.width-E.mw*view.sc)/2;view.py=(r.height-E.mh*view.sc)/2+10;}
+function resize(){const r=cvs.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);
+ cvs.width=Math.round(r.width*d);cvs.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);draw();}
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function nodeR(n){return n.a&&n.a.parent?3.5:Math.max(3.5,Math.min(13,3+2.2*Math.sqrt(Math.max(0,+n.w||0))));}
+function tkKey(a,b){return a<b?a+'|'+b:b+'|'+a;}
+function curPreset(){if(tab!=='preset'||!E.chapters[presetCh])return null;const c=E.chapters[presetCh];
+ if(!c.pre)c.pre='p'+c.y0;if(!E.presets[c.pre])E.presets[c.pre]={gr:1,st:[],g0:[],unl:[],tk:[],ln:[]};
+ const P=E.presets[c.pre];['st','g0','unl','tk','ln'].forEach(k=>{if(!Array.isArray(P[k]))P[k]=[];});if(P.gr==null)P.gr=1;return P;}
+let raf=0;function draw(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;paint();});}
+function paint(){
+ const r=cvs.getBoundingClientRect(),W=r.width,H=r.height;
+ ctx.clearRect(0,0,W,H);if(!E||!E.grid)return;
+ ctx.fillStyle=cssv('--mapbg');ctx.fillRect(0,0,W,H);
+ const [ox,oy]=M2S(0,0),mw=E.mw*view.sc,mh=E.mh*view.sc;
+ ctx.imageSmoothingEnabled=false;ctx.drawImage(maskCanvas(),ox,oy,mw,mh);
+ if(refImg&&refShow){ctx.globalAlpha=refOp;ctx.imageSmoothingEnabled=true;ctx.drawImage(refImg,ox,oy,mw,mh);ctx.globalAlpha=1;}
+ ctx.strokeStyle=cssv('--line2');ctx.lineWidth=1;ctx.strokeRect(ox-.5,oy-.5,mw+1,mh+1);
+ // 칸 격자(확대했을 때만)
+ const cpx=cs()*view.sc;
+ if(cpx>=10){ctx.strokeStyle='rgba(0,0,0,.07)';ctx.beginPath();
+  for(let i=0;i<=E.grid.W;i++){const X=ox+i*cpx;if(X<0||X>W)continue;ctx.moveTo(X,Math.max(0,oy));ctx.lineTo(X,Math.min(H,oy+mh));}
+  const ch=E.mh/E.grid.H*view.sc;for(let j=0;j<=E.grid.H;j++){const Y=oy+j*ch;if(Y<0||Y>H)continue;ctx.moveTo(Math.max(0,ox),Y);ctx.lineTo(Math.min(W,ox+mw),Y);}ctx.stroke();}
+ // 산 표시(게임과 같은 삼각형 · 지도 좌표 기준 크기)
+ if(E.peaks.length){ctx.save();ctx.fillStyle='#6b6b6b';ctx.globalAlpha=tab==='map'?.6:.35;ctx.beginPath();const k=view.sc;
+  E.peaks.forEach(([x,y])=>{const [X,Y]=M2S(x,y);ctx.moveTo(X-11*k,Y+9*k);ctx.lineTo(X,Y-9*k);ctx.lineTo(X+11*k,Y+9*k);ctx.closePath();});ctx.fill();ctx.restore();}
+ const idx={};E.nodes.forEach((n,i)=>idx[n.n]=i);
+ // 주축
+ if((tab==='chapter'||tab==='node')&&E.axis.length>1){ctx.save();ctx.strokeStyle=cssv('--sel');ctx.lineWidth=3;ctx.setLineDash([8,6]);ctx.beginPath();
+  E.axis.forEach((nm,q)=>{const n=E.nodes[idx[nm]];if(!n)return;const [X,Y]=M2S(n.x,n.y);q?ctx.lineTo(X,Y):ctx.moveTo(X,Y);});ctx.stroke();ctx.restore();}
+ // 서브역과 모도시
+ ctx.save();ctx.strokeStyle='rgba(0,0,0,.35)';ctx.setLineDash([3,3]);ctx.beginPath();
+ E.nodes.forEach(n=>{const p=n.a&&n.a.parent;if(!p||idx[p]==null)return;const q=E.nodes[idx[p]];const A=M2S(n.x,n.y),B=M2S(q.x,q.y);ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);});ctx.stroke();ctx.restore();
+ // 프리셋
+ const P=curPreset();const stSet=new Set(P?P.st:[]);
+ if(P){P.tk.forEach((t,ti)=>{const a=E.nodes[idx[t[0]]],b=E.nodes[idx[t[1]]];if(!a||!b)return;const A=M2S(a.x,a.y),B=M2S(b.x,b.y);
+   const on=sel.kind==='tk'&&sel.i===ti;ctx.lineCap='round';
+   ctx.strokeStyle=on?cssv('--sel'):'#2b2f2a';ctx.lineWidth=2+Math.log2(t[3]||1)*2.2+(on?2:0);ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);ctx.stroke();
+   if(t[2]){ctx.strokeStyle='#fff';ctx.lineWidth=1.4;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);ctx.stroke();ctx.setLineDash([]);}});
+  P.ln.forEach((L,li)=>{const col=REGCOL[(li+3)%REGCOL.length];ctx.strokeStyle=col;ctx.globalAlpha=li===lineEdit?1:.75;ctx.lineWidth=li===lineEdit?4:2.5;
+   const off=(li%5-2)*3;ctx.beginPath();(L[2]||[]).forEach((nm,q)=>{const n=E.nodes[idx[nm]];if(!n)return;const [X,Y]=M2S(n.x,n.y);q?ctx.lineTo(X+off,Y+off):ctx.moveTo(X+off,Y+off);});ctx.stroke();ctx.globalAlpha=1;});}
+ // 드래그 중인 선로
+ if(drag&&drag.kind==='tk'&&drag.cur){const a=E.nodes[drag.a];const A=M2S(a.x,a.y);ctx.strokeStyle=cssv('--sel');ctx.lineWidth=3;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(drag.cur[0],drag.cur[1]);ctx.stroke();ctx.setLineDash([]);}
+ // 노드
+ const showReg=tab==='region';const fs=Math.max(10,Math.min(13,10+view.sc*1.2));
+ ctx.font='600 '+fs+'px '+cssv('--font');ctx.textBaseline='middle';
+ E.nodes.forEach((n,i)=>{const [X,Y]=M2S(n.x,n.y);if(X<-40||Y<-40||X>W+40||Y>H+40)return;
+  const rr=nodeR(n),sub=n.a&&n.a.parent,hid=n.a&&n.a.hid;
+  let fill=showReg?(REGCOL[n.r%REGCOL.length]):(sub?'#8a9086':'#2b2f2a');
+  if(P&&!stSet.has(n.n))fill='#c5cac2';
+  ctx.globalAlpha=hid?.55:1;ctx.fillStyle=fill;ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.beginPath();
+  if(sub){ctx.moveTo(X,Y-rr-1);ctx.lineTo(X+rr+1,Y);ctx.lineTo(X,Y+rr+1);ctx.lineTo(X-rr-1,Y);ctx.closePath();}
+  else if(n.hub)ctx.rect(X-rr,Y-rr,rr*2,rr*2);else ctx.arc(X,Y,rr,0,Math.PI*2);
+  ctx.fill();ctx.stroke();
+  if(i===0){ctx.strokeStyle=cssv('--sel');ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Y,rr+4,0,Math.PI*2);ctx.stroke();}
+  if(P&&stSet.has(n.n)&&P.g0.indexOf(n.n)>=0){ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(X,Y,2,0,Math.PI*2);ctx.fill();}
+  if((sel.kind==='node'&&sel.i===i)||(drag&&drag.kind==='tk'&&drag.a===i)){ctx.strokeStyle=cssv('--sel');ctx.lineWidth=3;ctx.beginPath();ctx.arc(X,Y,rr+6,0,Math.PI*2);ctx.stroke();}
+  if(hover&&hover.i===i){ctx.strokeStyle=cssv('--acc');ctx.lineWidth=2;ctx.beginPath();ctx.arc(X,Y,rr+3,0,Math.PI*2);ctx.stroke();}
+  if(view.sc>.35||n.hub||i===0){const t=n.n;ctx.lineWidth=3;ctx.strokeStyle='rgba(255,255,255,.9)';ctx.strokeText(t,X+rr+4,Y);ctx.fillStyle='#1d211c';ctx.fillText(t,X+rr+4,Y);}
+  ctx.globalAlpha=1;});
+ // 보정점
+ if(tab==='map'&&E.calib&&E.calib.p){E.calib.p.forEach((p,q)=>{if(p.x==null)return;const [X,Y]=M2S(p.x,p.y);ctx.strokeStyle='#c23b2a';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(X-9,Y);ctx.lineTo(X+9,Y);ctx.moveTo(X,Y-9);ctx.lineTo(X,Y+9);ctx.stroke();ctx.fillStyle='#c23b2a';ctx.fillText(String(q+1),X+8,Y-9);});}
+ // 붓 미리보기
+ if(tab==='map'&&(tool==='paint')&&hover&&hover.m){const c=cs(),ch=E.mh/E.grid.H;const cx=Math.floor(hover.m[0]/c),cy=Math.floor(hover.m[1]/ch);
+  const [X,Y]=M2S((cx-brush+1)*c,(cy-brush+1)*ch);ctx.strokeStyle=cssv('--sel');ctx.lineWidth=1.5;ctx.strokeRect(X,Y,(brush*2-1)*c*view.sc,(brush*2-1)*ch*view.sc);}
+}
+
+/* ------------------------------------------------------------------ 지도 조작 */
+function paintAt(x,y,m){const g=E.grid,c=cs(),ch=E.mh/g.H,cx=Math.floor(x/c),cy=Math.floor(y/ch);let ch2=false;
+ for(let j=cy-brush+1;j<=cy+brush-1;j++)for(let i=cx-brush+1;i<=cx+brush-1;i++){if(i<0||j<0||i>=g.W||j>=g.H)continue;const k=j*g.W+i;if(g.mask[k]!==m){g.mask[k]=m;ch2=true;}}
+ if(ch2){mcache&&(mcache.dirty=true);draw();}}
+function paintLine(a,b,m){const c=cs(),d=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.max(1,Math.ceil(d/(c*.5)));
+ for(let s=0;s<=n;s++)paintAt(a[0]+(b[0]-a[0])*s/n,a[1]+(b[1]-a[1])*s/n,m);}
+function fillAt(x,y,m){const g=E.grid,cx=Math.floor(x/cs()),cy=Math.floor(y/(E.mh/g.H));if(cx<0||cy<0||cx>=g.W||cy>=g.H)return;
+ const k0=cy*g.W+cx,from=g.mask[k0];if(from===m)return;push();const st=[k0];g.mask[k0]=m;
+ while(st.length){const k=st.pop(),i=k%g.W,j=(k/g.W)|0;
+  [[i-1,j],[i+1,j],[i,j-1],[i,j+1]].forEach(([a,b])=>{if(a<0||b<0||a>=g.W||b>=g.H)return;const q=b*g.W+a;if(g.mask[q]===from){g.mask[q]=m;st.push(q);}});}
+ mcache&&(mcache.dirty=true);draw();}
+function nodeAt(X,Y){let best=-1,bd=1e9;E.nodes.forEach((n,i)=>{const [x,y]=M2S(n.x,n.y);const d=Math.hypot(x-X,y-Y);if(d<Math.max(10,nodeR(n)+5)&&d<bd){bd=d;best=i;}});return best;}
+function peakAt(x,y){return E.peaks.findIndex(p=>Math.abs(p[0]-x)<11&&Math.abs(p[1]-y)<10);}
+function tkAt(X,Y){const P=curPreset();if(!P)return -1;const idx={};E.nodes.forEach((n,i)=>idx[n.n]=i);let best=-1,bd=8;
+ P.tk.forEach((t,ti)=>{const a=E.nodes[idx[t[0]]],b=E.nodes[idx[t[1]]];if(!a||!b)return;const A=M2S(a.x,a.y),B=M2S(b.x,b.y);
+  const dx=B[0]-A[0],dy=B[1]-A[1],L=dx*dx+dy*dy||1;let u=((X-A[0])*dx+(Y-A[1])*dy)/L;u=Math.max(0,Math.min(1,u));
+  const d=Math.hypot(A[0]+u*dx-X,A[1]+u*dy-Y);if(d<bd){bd=d;best=ti;}});return best;}
+function uniqName(base){let n=base,k=2;const s=new Set(E.nodes.map(x=>x.n));while(s.has(n))n=base+' '+(k++);return n;}
+function renameNode(i,nm){const old=E.nodes[i].n;nm=nm.trim();if(!nm||nm===old)return false;
+ if(E.nodes.some((n,j)=>j!==i&&n.n===nm)){toast('같은 이름의 노드가 이미 있습니다');return false;}
+ push();E.nodes[i].n=nm;const R=x=>x===old?nm:x;
+ E.nodes.forEach(n=>{const a=n.a||{};if(a.parent===old)a.parent=nm;if(a.only===old)a.only=nm;if(a.unlock&&a.unlock.by===old)a.unlock.by=nm;});
+ if(E.mount.has(old)){E.mount.delete(old);E.mount.add(nm);}
+ E.axis=E.axis.map(R);
+ Object.values(E.presets).forEach(P=>{['st','g0','unl'].forEach(k=>{if(P[k])P[k]=P[k].map(R);});(P.tk||[]).forEach(t=>{t[0]=R(t[0]);t[1]=R(t[1]);});
+  (P.ln||[]).forEach(L=>{L[2]=(L[2]||[]).map(R);if(L[4])L[4]=L[4].map(R);});});
+ const qs=JSON.stringify([RAW.quests||[],RAW.events||[]]);if(qs.indexOf('"'+old+'"')>=0)toast('의뢰 · 이벤트 데이터가 옛 이름 「'+old+'」을 가리킬 수 있습니다. 검증에서 확인하십시오');
+ return true;}
+function delNode(i){const nm=E.nodes[i].n;push();E.nodes.splice(i,1);E.mount.delete(nm);E.axis=E.axis.filter(x=>x!==nm);
+ E.nodes.forEach(n=>{const a=n.a||{};if(a.parent===nm){delete a.parent;delete a.acc;delete a.unlock;}if(a.unlock&&a.unlock.by===nm)delete a.unlock;if(a.only===nm)delete a.only;});
+ Object.values(E.presets).forEach(P=>{['st','g0','unl'].forEach(k=>{if(P[k])P[k]=P[k].filter(x=>x!==nm);});P.tk=(P.tk||[]).filter(t=>t[0]!==nm&&t[1]!==nm);
+  (P.ln||[]).forEach(L=>{L[2]=(L[2]||[]).filter(x=>x!==nm);});});
+ sel={kind:null,i:-1};}
+
+/* ------------------------------------------------------------------ 입력 */
+let drag=null,spaceDown=false;const ptrs=new Map();
+cvs.addEventListener('contextmenu',e=>e.preventDefault());
+cvs.addEventListener('pointerdown',e=>{if(!E||!E.grid)return;cvs.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,[e.offsetX,e.offsetY]);
+ const X=e.offsetX,Y=e.offsetY,m=S2M(X,Y);
+ if(ptrs.size===2){const a=[...ptrs.values()];if(drag&&drag.kind==='paint')drag=null;drag={kind:'pinch',d0:Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]),sc0:view.sc,c0:[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2],v0:{...view}};return;}
+ if(e.button===1||e.button===2||spaceDown||tool==='pan'){drag={kind:'pan',x:X,y:Y,px:view.px,py:view.py};return;}
+ if(tab==='map'){
+  if(tool==='paint'){push();drag={kind:'paint',last:m,mat:e.altKey?0:mat};paintAt(m[0],m[1],drag.mat);return;}
+  if(tool==='fill'){fillAt(m[0],m[1],e.altKey?0:mat);return;}
+  if(tool==='peak'){const k=peakAt(m[0],m[1]);push();if(k>=0)E.peaks.splice(k,1);else E.peaks.push([Math.round(m[0]),Math.round(m[1])]);draw();renderLeft();return;}
+  if(tool==='calib'){const q=E.calib&&E.calib.next||0;push();E.calib=E.calib||{p:[{},{}],next:0};E.calib.p[q]=Object.assign(E.calib.p[q]||{},{x:r2(m[0]),y:r2(m[1])});E.calib.next=(q+1)%2;renderRight();draw();return;}}
+ if(tab==='node'||tab==='chapter'){
+  const i=nodeAt(X,Y);
+  if(tab==='chapter'){if(i>=0){push();const nm=E.nodes[i].n,k=E.axis.indexOf(nm);if(k>=0)E.axis.splice(k,1);else E.axis.push(nm);renderAll();}return;}
+  if(i>=0){sel={kind:'node',i};drag={kind:'move',i,ox:m[0]-E.nodes[i].x,oy:m[1]-E.nodes[i].y,moved:false};renderAll();return;}
+  if(tool==='add'){if(m[0]<0||m[1]<0||m[0]>E.mw||m[1]>E.mh)return;push();
+   E.nodes.push({n:uniqName('새 도시'),x:r2(m[0]),y:r2(m[1]),w:1,r:Math.min(E.regions.length-1,0),hub:0,a:{push:.5,pull:'일반시'}});
+   sel={kind:'node',i:E.nodes.length-1};renderAll();setTimeout(()=>{const f=$('#nName');f&&(f.focus(),f.select());},0);return;}
+  sel={kind:null,i:-1};renderAll();return;}
+ if(tab==='region'){const i=nodeAt(X,Y);drag={kind:'reg'};push();if(i>=0){E.nodes[i].r=regPaint;draw();}return;}
+ if(tab==='preset'){const P=curPreset();if(!P){toast('2챕터 이상이 있어야 프리셋을 그립니다');return;}const i=nodeAt(X,Y);
+  if(lineEdit>=0){if(i<0)return;const L=P.ln[lineEdit];const nm=E.nodes[i].n;push();
+   if(L[2][L[2].length-1]===nm)L[2].pop();else{L[2].push(nm);if(P.st.indexOf(nm)<0)P.st.push(nm);}renderAll();return;}
+  if(i>=0){drag={kind:'tk',a:i,x:X,y:Y,cur:null};return;}
+  const t=tkAt(X,Y);sel=t>=0?{kind:'tk',i:t}:{kind:null,i:-1};renderAll();return;}
+});
+cvs.addEventListener('pointermove',e=>{if(!E||!E.grid)return;const X=e.offsetX,Y=e.offsetY,m=S2M(X,Y);
+ if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,[X,Y]);
+ hover={m,i:nodeAt(X,Y)};
+ const ll=toLL(m[0],m[1]);$('#stPos').textContent='지도 '+Math.round(m[0])+', '+Math.round(m[1])+' · 경위도 '+ll[0].toFixed(3)+', '+ll[1].toFixed(3);
+ if(!drag){draw();return;}
+ if(drag.kind==='pinch'&&ptrs.size>=2){const a=[...ptrs.values()];const d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);const c=[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2];
+  const sc=Math.max(.05,Math.min(80,drag.v0.sc*d/Math.max(1,drag.d0)));const mx=(drag.c0[0]-drag.v0.px)/drag.v0.sc,my=(drag.c0[1]-drag.v0.py)/drag.v0.sc;
+  view.sc=sc;view.px=c[0]-mx*sc;view.py=c[1]-my*sc;draw();return;}
+ if(drag.kind==='pan'){view.px=drag.px+X-drag.x;view.py=drag.py+Y-drag.y;draw();return;}
+ if(drag.kind==='paint'){paintLine(drag.last,m,drag.mat);drag.last=m;return;}
+ if(drag.kind==='move'){const n=E.nodes[drag.i];if(!drag.moved){push();drag.moved=true;}n.x=r2(Math.max(0,Math.min(E.mw,m[0]-drag.ox)));n.y=r2(Math.max(0,Math.min(E.mh,m[1]-drag.oy)));draw();return;}
+ if(drag.kind==='reg'){const i=nodeAt(X,Y);if(i>=0&&E.nodes[i].r!==regPaint){E.nodes[i].r=regPaint;draw();}return;}
+ if(drag.kind==='tk'){drag.cur=[X,Y];draw();return;}
+});
+function endPtr(e){ptrs.delete(e.pointerId);if(!drag)return;const d=drag;
+ if(d.kind==='pinch'){if(ptrs.size<2)drag=null;return;}
+ drag=null;
+ if(d.kind==='move'){if(d.moved)renderRight();return;}
+ if(d.kind==='reg'){renderAll();return;}
+ if(d.kind==='paint'){renderLeft();return;}
+ if(d.kind==='tk'){const P=curPreset();const b=nodeAt(e.offsetX,e.offsetY);const A=E.nodes[d.a];
+  if(b<0||b===d.a){// 누르기만 하면 역을 놓거나 뺀다
+   if(Math.hypot(e.offsetX-d.x,e.offsetY-d.y)<6){push();const k=P.st.indexOf(A.n);if(k>=0){P.st.splice(k,1);P.g0=P.g0.filter(x=>x!==A.n);}else P.st.push(A.n);}
+   renderAll();return;}
+  const B=E.nodes[b],K=tkKey(A.n,B.n);const ti=P.tk.findIndex(t=>tkKey(t[0],t[1])===K);push();
+  if(ti>=0)sel={kind:'tk',i:ti};else{P.tk.push([A.n,B.n,0,1]);sel={kind:'tk',i:P.tk.length-1};}
+  [A.n,B.n].forEach(nm=>{if(P.st.indexOf(nm)<0)P.st.push(nm);});renderAll();return;}
+}
+cvs.addEventListener('pointerup',endPtr);cvs.addEventListener('pointercancel',endPtr);
+cvs.addEventListener('pointerleave',()=>{hover=null;draw();});
+cvs.addEventListener('wheel',e=>{if(!E||!E.grid)return;e.preventDefault();const k=Math.exp(-e.deltaY*.0015);const sc=Math.max(.05,Math.min(80,view.sc*k));
+ const mx=(e.offsetX-view.px)/view.sc,my=(e.offsetY-view.py)/view.sc;view.sc=sc;view.px=e.offsetX-mx*sc;view.py=e.offsetY-my*sc;draw();},{passive:false});
+window.addEventListener('keydown',e=>{const tg=e.target.tagName;const typing=tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT';
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!typing){e.preventDefault();e.shiftKey?redo():undo();return;}
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'&&!typing){e.preventDefault();redo();return;}
+ if(typing)return;
+ if(e.code==='Space'){spaceDown=true;e.preventDefault();}
+ if((e.key==='Delete'||e.key==='Backspace')&&sel.kind==='node'&&tab==='node'){delNode(sel.i);renderAll();}
+ if((e.key==='Delete'||e.key==='Backspace')&&sel.kind==='tk'&&tab==='preset'){const P=curPreset();push();P.tk.splice(sel.i,1);sel={kind:null,i:-1};renderAll();}
+ if(e.key==='Escape'){if(lineEdit>=0){lineEdit=-1;renderAll();}else{sel={kind:null,i:-1};renderAll();}}
+ if(e.key==='f'||e.key==='F'){fitView();draw();}
+ if(tab==='map'){const k={'1':1,'2':0,'3':3,'4':2}[e.key];if(k!=null){mat=k;renderToolbar();renderRight();}
+  if(e.key==='['){brush=Math.max(1,brush-1);renderRight();draw();}if(e.key===']'){brush=Math.min(40,brush+1);renderRight();draw();}}
+});
+window.addEventListener('keyup',e=>{if(e.code==='Space')spaceDown=false;});
+window.addEventListener('resize',resize);
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+
+/* ------------------------------------------------------------------ 화면: 도구 막대 */
+const TABS=[['meta','개요'],['map','지도'],['node','노드'],['region','권역'],['chapter','챕터'],['preset','프리셋'],['check','검증']];
+function setTab(t){tab=t;lineEdit=-1;if(t==='map'&&['paint','fill','peak','calib','pan'].indexOf(tool)<0)tool='paint';
+ if(t==='node'&&['select','add','pan'].indexOf(tool)<0)tool='select';sel=sel.kind==='node'&&(t==='node')?sel:{kind:null,i:-1};renderAll();}
+function renderToolbar(){const tb=$('#toolbar');let h='';if(!E||!E.grid){tb.innerHTML='';return;}
+ const B=(id,nm,ttl)=>'<button class="btn sm'+(tool===id?' on':'')+'" data-tool="'+id+'" title="'+esc(ttl||'')+'">'+nm+'</button>';
+ if(tab==='map'){h+=B('paint','붓','끌어서 칠합니다 · Alt를 누르고 칠하면 바다')+B('fill','채우기','이어진 같은 색 영역을 한 번에')+B('peak','산 표시','누르면 산 표시를 놓고, 있는 것을 누르면 지웁니다')+B('calib','보정점','두 지점을 찍고 실제 경위도를 넣으면 투영을 계산합니다(지시서 8-8)')+B('pan','이동','');
+  h+='<span style="width:8px"></span>'+MAT.map(M=>'<span class="sw'+(mat===M.id?' on':'')+'" data-mat="'+M.id+'" title="'+M.nm+'" style="background:rgb('+M.rgb.join(',')+')"></span>').join('');}
+ else if(tab==='node')h+=B('select','고르기 · 옮기기','노드를 누르면 고르고, 끌면 옮깁니다')+B('add','도시 추가','빈 곳을 누르면 도시를 놓습니다')+B('pan','이동','');
+ else if(tab==='region')h+=E.regions.map((nm,i)=>'<button class="btn sm'+(regPaint===i?' on':'')+'" data-reg="'+i+'"><span class="dot" style="display:inline-block;vertical-align:-1px;background:'+REGCOL[i%REGCOL.length]+'"></span> '+esc(nm)+'</button>').join('');
+ else if(tab==='preset'){h+=E.chapters.map((c,i)=>i?'<button class="btn sm'+(presetCh===i?' on':'')+'" data-pch="'+i+'">'+(i+1)+'챕터 · '+c.y0+'</button>':'').join('');
+  if(lineEdit>=0)h+='<button class="btn sm on" data-endline="1">노선 편집 끝 (Esc)</button>';}
+ h+='<button class="btn sm" data-fit="1" title="F">전체 보기</button>';
+ tb.innerHTML=h;
+ const hint={paint:'끌어서 칠하기 · [ ] 붓 크기 · 1~4 색',fill:'누른 곳과 이어진 같은 색을 채웁니다',peak:'산 표시 놓기 · 지우기',calib:'보정점 '+((E&&E.calib&&E.calib.next||0)+1)+'을 찍을 차례',
+  select:'노드를 끌어 옮기기 · Delete로 지우기',add:'빈 곳을 눌러 도시 추가',pan:'끌어서 지도 이동'};
+ $('#stTool').textContent=tab==='region'?'노드를 누르거나 끌어 지나가면 고른 지역으로 칠합니다':tab==='chapter'?'노드를 누르면 주축에 넣고 빼기':tab==='preset'?(lineEdit>=0?'역을 차례로 눌러 노선 정차역을 잇습니다 · 마지막 역을 다시 누르면 뺍니다':'노드 누르기 = 역 놓기/빼기 · 역에서 역으로 끌기 = 선로'):(hint[tool]||'');
+ $('#stTool').textContent+=' · 휠 확대 · 오른쪽 끌기 또는 스페이스 끌기로 이동';}
+$('#toolbar').addEventListener('click',e=>{const t=e.target.closest('[data-tool],[data-mat],[data-reg],[data-pch],[data-fit],[data-endline]');if(!t)return;
+ if(t.dataset.tool){tool=t.dataset.tool;if(tool==='calib'&&!E.calib){E.calib={p:[{},{}],next:0};}}
+ if(t.dataset.mat!=null){mat=+t.dataset.mat;tool=tool==='fill'?'fill':'paint';}
+ if(t.dataset.reg!=null)regPaint=+t.dataset.reg;
+ if(t.dataset.pch!=null){presetCh=+t.dataset.pch;sel={kind:null,i:-1};lineEdit=-1;}
+ if(t.dataset.endline){lineEdit=-1;}
+ if(t.dataset.fit){fitView();}
+ renderAll();});
+
+/* ------------------------------------------------------------------ 화면: 왼쪽 */
+let nodeQ='';
+function renderLeft(){const L=$('#left');if(!E||!E.grid){L.innerHTML='';return;}
+ let h='<div class="tabs">'+TABS.map(([id,nm])=>'<button class="'+(tab===id?'on':'')+'" data-tab="'+id+'">'+nm+'</button>').join('')+'</div>';
+ if(tab==='meta'){h+='<div class="sec"><h3>이 시나리오</h3><div class="hint">'+esc(E.meta.title||'(제목 없음)')+' · '+esc(E.meta.id)+' · 판 '+esc(E.meta.ver)+'</div>'
+  +'<p class="hint">지도 '+Math.round(E.mw)+' × '+Math.round(E.mh)+' (약 '+Math.round(E.mw*E.kmpp)+' × '+Math.round(E.mh*E.kmpp)+'km)<br>노드 '+E.nodes.length+' · 챕터 '+E.chapters.length+' · 의뢰 '+((RAW.quests||[]).length)+' · 사건 '+((RAW.events||[]).length)+'</p></div>'
+  +'<div class="sec"><h3>만드는 순서</h3><ol class="hint" style="padding-left:18px;margin:0">'
+  +'<li><b>지도</b> — 육지와 바다를 칠합니다. 참고 이미지를 깔고 따라 그리거나 자동으로 만들 수 있습니다</li>'
+  +'<li><b>노드</b> — 도시를 놓고 인구 가중 · 성격을 정합니다. 첫 노드가 수도입니다</li>'
+  +'<li><b>권역</b> — 지역 코드를 나누고 정책 권역에 묶습니다. 지역 코드 1번은 게임에서 산간 할증(×1.8)을 받습니다</li>'
+  +'<li><b>챕터</b> — 연도, 시작자본, 목표 셋 이하, 주축</li>'
+  +'<li><b>프리셋</b> — 2챕터부터 물려받는 철도망</li>'
+  +'<li><b>검증</b> — 게임 로더와 같은 검사를 통과하면 JSON으로 내보냅니다</li></ol></div>'
+  +'<div class="sec"><h3>게임에서 여는 법</h3><p class="hint">타이틀 → 새 게임 → 맵 고르기 → <b>시나리오 파일 불러오기</b>에서 내보낸 JSON을 고릅니다.</p></div>';}
+ else if(tab==='map'){const cnt=[0,0,0,0];E.grid.mask.forEach(v=>cnt[v]++);const T=E.grid.W*E.grid.H;
+  h+='<div class="sec"><h3>칸 구성</h3>'+MAT.map(M=>'<div class="row"><span class="dot" style="background:rgb('+M.rgb.join(',')+')"></span><span style="flex:1">'+M.nm+'</span><span class="hint">'+(cnt[M.id]/T*100).toFixed(1)+'%</span></div>').join('')
+  +'<p class="hint">게임은 파란 칸을 바다로, 흰 칸을 육지로, 회색 칸을 바깥 땅(외국 등)으로 그립니다.</p></div>'
+  +'<div class="sec"><h3>산 표시 '+E.peaks.length+'개</h3><p class="hint">지도에 그리는 삼각형 표시입니다. 실제 공사비 할증은 권역 탭의 지역 코드 1번과 노드의 「산악 지명」이 정합니다.</p>'
+  +(E.peaks.length?'<button class="btn sm bad" data-act="clrPeaks">산 표시 모두 지우기</button>':'')+'</div>';}
+ else if(tab==='node'){const q=nodeQ.trim();
+  h+='<div class="sec"><div class="row"><input type="text" id="nodeQ" placeholder="노드 찾기" value="'+esc(nodeQ)+'"></div><div class="hint">'+E.nodes.length+'곳 · 도시 '+E.nodes.filter(n=>!(n.a&&n.a.parent)).length+' · 서브역 '+E.nodes.filter(n=>n.a&&n.a.parent).length+'</div></div><ul class="lst">';
+  E.nodes.forEach((n,i)=>{if(q&&n.n.indexOf(q)<0)return;const sub=n.a&&n.a.parent;
+   h+='<li class="li'+(sel.kind==='node'&&sel.i===i?' on':'')+'" data-node="'+i+'"><span class="dot" style="background:'+REGCOL[n.r%REGCOL.length]+'"></span><span class="nm">'+(i===0?'★ ':'')+esc(n.n)+'</span><span class="meta">'+(sub?'서브역 · '+esc(n.a.parent):'w '+(+n.w).toFixed(2)+(n.hub?' · 거점':''))+'</span></li>';});
+  h+='</ul>';}
+ else if(tab==='region'){h+='<div class="sec"><h3>지역 코드</h3><p class="hint">노드마다 지역 코드 하나를 갖습니다. 인구 이동의 출신 지역을 묶는 단위이고, 정책 권역으로 다시 묶입니다.</p></div><ul class="lst">';
+  E.regions.forEach((nm,i)=>{const c=E.nodes.filter(n=>n.r===i).length;
+   h+='<li class="li'+(regPaint===i?' on':'')+'" data-regi="'+i+'"><span class="dot" style="background:'+REGCOL[i%REGCOL.length]+'"></span><span class="nm">'+i+' · '+esc(nm)+(i===1?' <span class="tag">산간 할증</span>':'')+'</span><span class="meta">'+c+'곳</span></li>';});
+  h+='</ul><div class="sec"><button class="btn sm" data-act="addReg">지역 추가</button></div>';}
+ else if(tab==='chapter'){h+='<ul class="lst">';
+  E.chapters.forEach((c,i)=>{h+='<li class="li'+(sel.kind==='ch'&&sel.i===i?' on':'')+'" data-ch="'+i+'"><span class="nm">'+(i+1)+'. '+esc(c.nm)+'</span><span class="meta">'+c.y0+'–'+c.y1+'</span></li>';});
+  h+='</ul><div class="sec"><button class="btn sm" data-act="addCh">챕터 추가</button></div>'
+  +'<div class="sec"><h3>주축 '+E.axis.length+'곳</h3><p class="hint">「주축 복선화」 목표가 셉니다(게임 데이터 이름 axes.gyeongbu). 지도에서 노드를 차례로 누르면 넣고 뺍니다.</p><div>'+E.axis.map(x=>'<span class="tag">'+esc(x)+'</span>').join(' → ')+'</div>'
+  +(E.axis.length?'<div class="row"><button class="btn sm" data-act="clrAxis">주축 비우기</button></div>':'')+'</div>';}
+ else if(tab==='preset'){if(E.chapters.length<2){h+='<div class="sec"><p class="hint">첫 챕터는 선로와 역이 하나도 없이 시작합니다(지시서 2-4). 챕터 탭에서 2챕터를 더하면 그 챕터가 물려받는 망을 여기서 그립니다.</p></div>';}
+  else{const P=curPreset();h+='<div class="sec"><h3>'+(presetCh+1)+'챕터 프리셋 · '+esc(E.chapters[presetCh].pre)+'</h3><p class="hint">역 '+P.st.length+' · 선로 '+P.tk.length+' · 노선 '+P.ln.length+'</p>'
+   +'<div class="row">'+(presetCh>1?'<button class="btn sm" data-act="copyPrev">앞 챕터 망 복사</button>':'')+'<button class="btn sm bad" data-act="clrPre">비우기</button></div></div>'
+   +'<div class="sec"><h3>노선</h3><ul class="lst" style="margin:0 -12px">';
+   P.ln.forEach((L,li)=>{h+='<li class="li'+(lineEdit===li?' on':'')+'" data-ln="'+li+'"><span class="dot" style="background:'+REGCOL[(li+3)%REGCOL.length]+'"></span><span class="nm">'+esc(L[0])+'</span><span class="meta">'+(L[2]||[]).length+'역 · '+L[3]+'편성'+(L[1]?' · 고속':'')+'</span></li>';});
+   h+='</ul><div class="row"><button class="btn sm" data-act="addLn">노선 추가</button></div></div>';}}
+ else if(tab==='check'){const R=checkAll();
+  h+='<div class="sec"><h3>게임 로더 검증</h3>'+(R.err.length?R.err.map(x=>'<div class="msg bad">'+esc(x)+'</div>').join(''):'<div class="msg ok">통과 · 게임이 이 파일을 읽을 수 있습니다</div>')+'</div>'
+  +'<div class="sec"><h3>제작기 경고 '+R.warn.length+'</h3>'+(R.warn.length?R.warn.map(x=>'<div class="msg warn">'+esc(x)+'</div>').join(''):'<p class="hint">없음</p>')+'</div>';}
+ L.innerHTML=h;}
+$('#left').addEventListener('click',e=>{const t=e.target.closest('[data-tab],[data-node],[data-regi],[data-ch],[data-ln],[data-act]');if(!t)return;
+ if(t.dataset.tab){setTab(t.dataset.tab);return;}
+ if(t.dataset.node!=null){sel={kind:'node',i:+t.dataset.node};const n=E.nodes[sel.i];const r=cvs.getBoundingClientRect();
+  const [X,Y]=M2S(n.x,n.y);if(X<40||Y<40||X>r.width-40||Y>r.height-40){view.px+=r.width/2-X;view.py+=r.height/2-Y;}renderAll();return;}
+ if(t.dataset.regi!=null){regPaint=+t.dataset.regi;sel={kind:'reg',i:regPaint};renderAll();return;}
+ if(t.dataset.ch!=null){sel={kind:'ch',i:+t.dataset.ch};renderAll();return;}
+ if(t.dataset.ln!=null){const li=+t.dataset.ln;lineEdit=lineEdit===li?-1:li;sel={kind:'ln',i:li};renderAll();return;}
+ act(t.dataset.act);});
+$('#left').addEventListener('input',e=>{if(e.target.id==='nodeQ'){nodeQ=e.target.value;const p=e.target.selectionStart;renderLeft();const f=$('#nodeQ');f.focus();f.setSelectionRange(p,p);}});
+function act(a){const P=tab==='preset'?curPreset():null;
+ if(a==='clrPeaks'){push();E.peaks=[];}
+ if(a==='addReg'){push();E.regions.push('지역 '+(E.regions.length+1));regPaint=E.regions.length-1;sel={kind:'reg',i:regPaint};}
+ if(a==='addCh'){push();const last=E.chapters[E.chapters.length-1];const y0=last?last.y1:1960;
+  E.chapters.push({y0,y1:y0+15,cap:last?Math.round(last.cap*2.5):2200,pre:'p'+y0,nm:(E.chapters.length+1)+'챕터',opin0:Math.max(50,(last?last.opin0:80)-5),fleet:clone(last?last.fleet:['steam','dsl']),press:'',
+   goals:[{nm:'누적 수송',m:'pax',tgt:1000,k:'pax',desc:'챕터 시작부터 지금까지 실제로 태운 승객의 누계입니다.'}]});
+  if(E.chapters.length>1){const c=E.chapters[E.chapters.length-1];if(!E.presets[c.pre]){const prev=E.chapters.length>2?E.presets[E.chapters[E.chapters.length-2].pre]:null;E.presets[c.pre]=prev?clone(prev):{gr:1,st:[],g0:[],unl:[],tk:[],ln:[]};}}
+  sel={kind:'ch',i:E.chapters.length-1};}
+ if(a==='clrAxis'){push();E.axis=[];}
+ if(a==='copyPrev'&&P){const prev=E.presets[E.chapters[presetCh-1].pre];if(prev){push();Object.assign(P,clone(prev));}}
+ if(a==='clrPre'&&P){if(!confirm('이 챕터의 프리셋 망을 모두 지울까요?'))return;push();P.st=[];P.g0=[];P.unl=[];P.tk=[];P.ln=[];lineEdit=-1;}
+ if(a==='addLn'&&P){push();P.ln.push(['새 노선 '+(P.ln.length+1),0,[],2]);lineEdit=P.ln.length-1;sel={kind:'ln',i:lineEdit};toast('지도에서 정차역을 차례로 누르십시오');}
+ renderAll();}
+
+/* ------------------------------------------------------------------ 화면: 오른쪽 */
+const F={
+ text:(id,lb,v,ph)=>'<div class="row"><label for="'+id+'">'+lb+'</label><div class="f"><input type="text" id="'+id+'" value="'+esc(v)+'" placeholder="'+esc(ph||'')+'"></div></div>',
+ num:(id,lb,v,st,ttl)=>'<div class="row" title="'+esc(ttl||'')+'"><label for="'+id+'">'+lb+'</label><div class="f"><input type="number" id="'+id+'" value="'+(v==null?'':v)+'" step="'+(st||'any')+'"></div></div>',
+ sel:(id,lb,v,opts)=>'<div class="row"><label for="'+id+'">'+lb+'</label><div class="f"><select id="'+id+'">'+opts.map(o=>'<option value="'+esc(o[0])+'"'+(String(o[0])===String(v)?' selected':'')+(o[2]?' disabled':'')+'>'+esc(o[1])+'</option>').join('')+'</select></div></div>',
+ chk:(id,lb,v,ttl)=>'<label class="chk" title="'+esc(ttl||'')+'"><input type="checkbox" id="'+id+'"'+(v?' checked':'')+'> '+lb+'</label>',
+ area:(id,lb,v,rows)=>'<div class="row" style="display:block"><label for="'+id+'" style="display:block;margin-bottom:3px">'+lb+'</label><textarea id="'+id+'" rows="'+(rows||3)+'">'+esc(v)+'</textarea></div>'};
+function renderRight(){const R=$('#right');if(!E||!E.grid){R.innerHTML='';return;}let h='';
+ if(tab==='meta'){h+='<div class="sec"><h3>기본 정보</h3>'+F.text('mId','식별자',E.meta.id,'영문 · 숫자')+F.text('mVer','판',E.meta.ver)+F.text('mTitle','제목',E.meta.title)+F.text('mTag','꼬리표',E.meta.tag,'예: 협궤 · 해협')+F.area('mDesc','설명 (맵 선택 화면)',E.meta.desc,4)
+  +'<p class="hint">식별자는 세이브가 시나리오를 찾는 열쇠입니다. 이미 배포한 파일의 식별자는 바꾸지 마십시오(지시서 2-5).</p></div>'
+  +'<div class="sec"><h3>규모 · 거리</h3>'+F.num('mKm','km / 지도 단위',r6(E.kmpp),'0.0001','지도 좌표 1이 몇 km인가. 한국은 0.52235')
+  +'<p class="hint">지도 '+Math.round(E.mw)+' × '+Math.round(E.mh)+' 단위 ≈ '+Math.round(E.mw*E.kmpp)+' × '+Math.round(E.mh*E.kmpp)+'km. 보정점 두 개로 실제 경위도를 맞추면 이 값도 자동으로 계산됩니다(지도 탭).</p></div>'
+  +'<div class="sec"><h3>수요 · 인구 균형 (bal)</h3><div class="grid2">'
+  +F.num('bDem','수요 배율',E.bal.dem,'0.1')+F.num('bWmin','w 하한',E.bal.wmin,'0.01')+F.num('bCity','도시 w 기준',E.bal.cityW,'0.1')+F.num('bSmall','소도시 w 기준',E.bal.small,'0.1')+F.num('bK0','역 없는 수용력',E.bal.k0,'0.05')+F.num('bK1','접근성 계수',E.bal.k1,'0.05')
+  +'</div><p class="hint">한국은 수요 배율 2.4 · 역 없는 노드 수용력 1.0, 가람 지방은 0.7입니다.</p></div>'
+  +'<div class="sec"><h3>행정 종류 이름</h3><p class="hint">수요 그래프가 노드를 묶는 이름입니다. 첫 노드는 「'+esc((E.dem[0]||[])[1])+'」, 거점은 「'+esc((E.dem[1]||[])[1])+'」, 군 표시는 「'+esc((E.dem[3]||E.dem[2]||[])[1])+'」로 셉니다.</p>'
+  +E.dem.map((d,i)=>F.text('dk'+i,d[0],d[1])).join('')+'</div>'
+  +'<div class="sec"><h3>그 밖의 데이터</h3><p class="hint">시대 곡선 · 경쟁 수단 · 테크트리 · 차종 · 정책 · 재해 값은 '+({blank:'한국 시나리오',kr:'한국 시나리오',gr:'가람 지방(한국 값을 빌림)'}[RAW.__from]||'연 파일')+'의 것을 그대로 씁니다. 의뢰 '+((RAW.quests||[]).length)+'건과 사건 '+((RAW.events||[]).length)+'건은 연 그대로 내보냅니다.</p>'
+  +F.chk('mHid','맵 선택 화면에서 숨김 (hidden)',E.meta.hidden)+'</div>';}
+ else if(tab==='map'){const g=E.grid;
+  h+='<div class="sec"><h3>칠하기</h3><div class="row">'+MAT.map(M=>'<span class="sw'+(mat===M.id?' on':'')+'" data-mat="'+M.id+'" style="background:rgb('+M.rgb.join(',')+')"></span> <span style="margin-right:8px">'+M.nm+' <span class="kbd">'+({1:1,0:2,3:3,2:4})[M.id]+'</span></span>').join('')+'</div>'
+  +'<div class="row"><label>붓 크기</label><div class="f"><input type="range" id="brush" min="1" max="40" value="'+brush+'"></div><span class="kbd">'+(brush*2-1)+'칸</span></div>'
+  +'<div class="row"><button class="btn sm" data-r="fillAll">전체를 고른 색으로</button></div></div>'
+  +'<div class="sec"><h3>참고 이미지</h3><p class="hint">실제 지도나 손그림을 깔고 따라 칠합니다. 이미지는 지도 영역에 맞춰 늘어나며 시나리오에는 들어가지 않습니다.</p>'
+  +'<div class="row"><button class="btn sm" data-r="refLoad">이미지 고르기</button>'+(refImg?'<button class="btn sm" data-r="refFit">지도 비율을 이미지에 맞추기</button><button class="btn sm" data-r="refAuto">이미지로 육지 · 바다 만들기</button><button class="btn sm bad" data-r="refDel">빼기</button>':'')+'</div>'
+  +(refImg?'<div class="row"><label>불투명도</label><div class="f"><input type="range" id="refOp" min="0" max="1" step="0.05" value="'+refOp+'"></div></div>'+F.chk('refShow','보이기',refShow):'')+'</div>'
+  +'<div class="sec"><h3>지도 크기</h3><div class="grid2">'+F.num('gW','가로 칸',g.W,'1')+F.num('gH','세로 칸',g.H,'1')+'</div>'+F.num('gCs','칸 크기(지도 단위)',r2(cs()),'0.1','칸 하나가 지도 좌표 몇 단위인가. 한국 지도는 약 2')
+  +'<div class="row"><button class="btn sm" data-r="resize">크기 바꾸기</button></div><p class="hint">칸을 늘리면 오른쪽 · 아래에 바다가 붙고, 줄이면 잘립니다. 칸 크기를 바꾸면 노드는 같은 칸 위치에 남습니다. 지금 지도 '+Math.round(E.mw)+' × '+Math.round(E.mh)+' 단위.</p></div>'
+  +'<div class="sec"><h3>투영 (경위도)</h3>';
+  const C=E.calib;
+  if(C&&C.p){h+='<p class="hint">「보정점」 도구로 지도에서 두 지점을 찍고 그 지점의 실제 경도 · 위도를 넣습니다. 노드는 지도 위치 그대로이고, 내보낼 때 경위도가 새 투영으로 계산됩니다.</p>';
+   C.p.forEach((p,q)=>{h+='<div class="goal"><b>보정점 '+(q+1)+'</b> <span class="hint">'+(p.x!=null?'지도 '+Math.round(p.x)+', '+Math.round(p.y):'아직 찍지 않음')+'</span><div class="grid2">'+F.num('cLo'+q,'경도',p.lon,'0.0001')+F.num('cLa'+q,'위도',p.lat,'0.0001')+'</div></div>';});
+   h+='<div class="row"><button class="btn sm pri" data-r="calApply">투영 계산</button><button class="btn sm" data-r="calOff">가상 투영으로</button></div>';}
+  else h+='<p class="hint">지금은 가상 투영입니다(가람 지방과 같음). 실제 지형을 쓰는 지도라면 보정점 도구로 두 지점의 경위도를 맞추십시오.</p><div class="row"><button class="btn sm" data-r="calOn">보정점 쓰기</button></div>';
+  h+='<p class="hint" style="font-family:var(--mono)">proj ['+E.proj.map(v=>+(+v).toFixed(4)).join(', ')+']</p></div>';}
+ else if(tab==='node'){
+  if(sel.kind==='node'&&E.nodes[sel.i]){const i=sel.i,n=E.nodes[i],a=n.a||(n.a={});const sub=!!a.parent;const ll=toLL(n.x,n.y);
+   const pulls=Object.keys(RAW.pullProf||{});const pv=typeof a.pull==='string'?a.pull:(typeof a.pull==='number'?'#num':(a.pull?'#curve':''));
+   const psv=typeof a.push==='number'?'#num':(a.push?'#curve':'');
+   h+='<div class="sec"><h3>'+(i===0?'★ 수도 · ':'')+(sub?'서브역':'도시')+'</h3>'+F.text('nName','이름',n.n)
+   +'<div class="grid2">'+F.num('nX','지도 x',r2(n.x),'0.5')+F.num('nY','지도 y',r2(n.y),'0.5')+'</div><p class="hint">경도 '+ll[0].toFixed(4)+' · 위도 '+ll[1].toFixed(4)+'</p>'
+   +F.sel('nReg','지역 코드',n.r,E.regions.map((r,q)=>[q,q+' · '+r+(q===1?' (산간 할증)':'')]))
+   +(i!==0&&!sub?'<div class="row"><button class="btn sm" data-r="mkCap">수도로 지정 (맨 앞으로)</button></div>':'')+'</div>';
+   if(!sub){h+='<div class="sec"><h3>인구와 성격</h3>'+F.num('nW','인구 가중 w0',n.w,'0.01','1960년 기준. 한국: 서울 10 · 인천 2.82 · 소도시 0.4 안팎')
+    +F.chk('nHub','거점 (행정 「'+esc((E.dem[1]||[])[1])+'」)',n.hub)+F.chk('nSmall','소도시 (연결 목표가 셈)',a.small)+F.chk('nGun','군 지역 (끌 수 있음)',a.gun)+F.chk('nMount','산악 지명 (공사비 ×1.5)',E.mount.has(n.n))
+    +F.sel('nPush','전출 성향 push',psv||'#num',[['#num','숫자'],['#curve','연도별 곡선',psv!=='#curve']])
+    +(psv==='#curve'?'<p class="hint">연도점 곡선 '+((a.push.p||[]).length)+'개 · 아래 고급 속성에서 고칩니다</p>':F.num('nPushV','push 값 (0~1)',typeof a.push==='number'?a.push:.5,'0.05','클수록 인구가 빠져나갑니다'))
+    +F.sel('nPull','흡인 프로필 pull',pv||'일반시',pulls.map(p=>[p,p]).concat([['#num','숫자 직접'],['#curve','연도별 곡선',pv!=='#curve']]))
+    +(pv==='#num'?F.num('nPullV','pull 값',a.pull,'0.05'):'')+(pv==='#curve'?'<p class="hint">연도점 곡선 · 아래 고급 속성에서 고칩니다</p>':'')
+    +F.text('nInd','산업',a.ind||'','예: 시멘트 (산업선 과제가 씀)')+'</div>';}
+   h+='<div class="sec"><h3>서브역</h3><p class="hint">큰 도시 안의 별도 역입니다. 수요를 만들지 않고 모도시의 수요를 나눠 받습니다. 인구 가중은 0으로 둡니다.</p>'
+   +F.sel('nPar','모도시',a.parent||'',[['','— 서브역 아님 —']].concat(E.nodes.filter((x,j)=>j!==i&&!(x.a&&x.a.parent)).map(x=>[x.n,x.n])));
+   if(sub)h+=F.num('nAcc','도보 환승(분)',a.acc,'1')+F.num('nUnl','해금 · 모도시 w',a.unlock?a.unlock.w:'','0.1','모도시 인구 가중이 이 값을 넘으면 지도에 드러납니다. 비우면 처음부터 열림')
+    +F.chk('nHid','숨은 역 (이스터에그)',a.hid)+F.chk('nSea','바다 위 역',a.sea)+F.text('nOnly','이 역하고만 연결',a.only||'');
+   h+='</div><div class="sec"><h3>고급 속성 (JSON)</h3>'+F.area('nAttr','',JSON.stringify(a),4)+'<div class="row"><button class="btn sm" data-r="attrApply">적용</button></div></div>'
+   +'<div class="sec"><button class="btn sm bad" data-r="delNode">이 노드 지우기 (Delete)</button></div>';}
+  else h+='<div class="sec"><h3>노드</h3><p class="hint">「도시 추가」 도구로 빈 곳을 누르면 도시가 생깁니다. 노드를 누르면 여기서 속성을 고칩니다.</p>'
+   +'<p class="hint">● 도시 · ■ 거점 · ◆ 서브역 · 노란 고리 = 수도(첫 노드). 크기는 인구 가중입니다.</p></div>';}
+ else if(tab==='region'){const i=regPaint;
+  h+='<div class="sec"><h3>지역 '+i+'</h3>'+F.text('rName','이름',E.regions[i]||'')
+  +(i===1?'<div class="msg warn">게임은 지역 코드 1번 노드에 산간 지형 할증(공사비 ×1.8)을 겁니다. 산악 지역을 1번에 두십시오(지시서 1-4 거, 게임 쪽 고정값).</div>':'')
+  +F.sel('rPol','정책 권역',(E.pregs.find(R=>(R.pv||[]).indexOf(i)>=0)||{}).id||'',[['','— 묶지 않음 —']].concat(E.pregs.map(R=>[R.id,R.nm+' ('+R.id+')'])))
+  +(E.regions.length>1?'<div class="row"><button class="btn sm bad" data-r="delReg">이 지역 지우기</button></div><p class="hint">지우면 이 지역의 노드는 0번 지역으로 가고 뒤 번호가 하나씩 당겨집니다.</p>':'')+'</div>'
+  +'<div class="sec"><h3>정책 권역</h3><p class="hint">정책 창 · 재해 · 수요 그래프가 쓰는 묶음입니다. 식별자는 정책 · 재해 데이터가 가리키므로 그대로 두고 이름만 바꿉니다. 노드가 없는 권역은 게임 화면에서 감춰집니다.</p>'
+  +E.pregs.map((R,q)=>F.text('pg'+q,R.id+' <span class="hint">('+(R.pv||[]).map(c=>E.regions[c]).filter(Boolean).join(', ')+')</span>',R.nm)).join('')+'</div>';}
+ else if(tab==='chapter'){const i=sel.kind==='ch'?sel.i:-1,c=E.chapters[i];
+  if(!c)h+='<div class="sec"><p class="hint">왼쪽에서 챕터를 고르십시오. 챕터마다 목표는 셋 이하이고, 둘이 서로 부딪히게 두는 것이 원칙입니다(지시서 B-4).</p></div>';
+  else{const vl=((RAW.veh&&RAW.veh.list)||[]);
+   h+='<div class="sec"><h3>'+(i+1)+'챕터</h3>'+F.text('cNm','이름',c.nm)+'<div class="grid2">'+F.num('cY0','시작 연도',c.y0,'1')+F.num('cY1','끝 연도',c.y1,'1')+'</div>'
+   +F.num('cCap','시작자본(억)',c.cap,'10')+F.num('cOp','여론 기준값',c.opin0,'1')+F.text('cPress','주도 압력 한 줄',c.press||'','예: 자본 — 빈 지도에서 첫 간선을 깝니다')
+   +'<div class="row" style="display:block"><label>시작 차종</label><div>'+vl.map(v=>F.chk('cf_'+v.id,esc(v.nm),(c.fleet||[]).indexOf(v.id)>=0)).join('')+'</div></div>'
+   +'<p class="hint">'+(i===0?'첫 챕터는 프리셋 없이 시작합니다.':'프리셋 '+esc(c.pre||'')+' · 프리셋 탭에서 그립니다.')+'</p></div>'
+   +'<div class="sec"><h3>목표 '+(c.goals||[]).length+' / 3</h3>';
+   (c.goals||[]).forEach((g,q)=>{const M=MET.find(x=>x[0]===g.m);const k=g.k;
+    let tv=g.tgt,unit='';if(k==='pax'&&g.m==='pax'){tv=g.tgt/10;unit='만 명';}else if(k==='ratio'||k==='lteRatio'){tv=r2(g.tgt*100);unit='%';}else if(k==='lteMoney'){tv=g.tgt/1e8;unit='억';}else if(k==='km')unit='km';
+    h+='<div class="goal">'+F.text('g'+q+'nm','이름',g.nm)+F.sel('g'+q+'m','지표',g.m,MET.map(x=>[x[0],x[1]+(x[4]?' (한국 전용)':''),x[4]&&x[0]!==g.m]))
+     +F.sel('g'+q+'k','판정',g.k,GK)+(k==='money'?'':F.num('g'+q+'t','목표값 ('+(unit||'값')+')',tv,'any'))
+     +(M?'<p class="hint">'+esc(M[3])+'</p>':'')+F.area('g'+q+'d','설명',g.desc||'',2)
+     +'<div class="row"><button class="btn sm bad" data-r="delGoal" data-q="'+q+'">목표 빼기</button></div></div>';});
+   h+=((c.goals||[]).length<3?'<button class="btn sm" data-r="addGoal">목표 추가</button>':'')+'</div>'
+   +'<div class="sec">'+(E.chapters.length>1?'<button class="btn sm bad" data-r="delCh">이 챕터 지우기</button>':'')+'</div>';}}
+ else if(tab==='preset'){const P=curPreset();
+  if(!P)h+='<div class="sec"><p class="hint">2챕터 이상이 필요합니다.</p></div>';
+  else{h+='<div class="sec"><h3>물려받는 역</h3>'+F.sel('pGr','기본 역 등급',P.gr,GRADE.map((g,q)=>[q,g]))+'<p class="hint">프리셋의 역은 이 등급으로 시작합니다. 아래 역 목록에서 눌러 점을 찍은 역만 간이역으로 둡니다.</p></div>';
+   if(sel.kind==='tk'&&P.tk[sel.i]){const t=P.tk[sel.i];
+    h+='<div class="sec"><h3>선로 · '+esc(t[0])+' – '+esc(t[1])+'</h3>'+F.sel('tN','선로 수',t[3],NLIST.map(n=>[n,NLBL[n]]))+F.chk('tHs','고속 선로',t[2])
+     +'<div class="row"><button class="btn sm bad" data-r="delTk">선로 지우기 (Delete)</button></div></div>';}
+   if(sel.kind==='node'&&E.nodes[sel.i]){}
+   if(lineEdit>=0&&P.ln[lineEdit]){const L=P.ln[lineEdit];
+    h+='<div class="sec"><h3>노선</h3>'+F.text('lNm','이름',L[0])+F.num('lTr','편성 수',L[3],'1')+F.chk('lHs','고속 노선',L[1])
+     +'<p class="hint">정차역: '+((L[2]||[]).map(esc).join(' → ')||'없음 · 지도에서 역을 차례로 누르십시오')+'</p>'
+     +'<div class="row"><button class="btn sm" data-r="revLn">방향 뒤집기</button><button class="btn sm bad" data-r="delLn">노선 지우기</button></div></div>';}
+   h+='<div class="sec"><h3>역 목록 '+P.st.length+'</h3><p class="hint">점이 찍힌 역은 간이역으로 물려받습니다.</p><div>'+P.st.map(nm=>'<span class="tag" style="cursor:pointer" data-g0="'+esc(nm)+'" title="눌러서 간이역 표시">'+(P.g0.indexOf(nm)>=0?'· ':'')+esc(nm)+'</span>').join('')+'</div></div>';}}
+ else if(tab==='check'){const R=checkAll();
+  h+='<div class="sec"><h3>내보내기</h3><p class="hint">'+(R.err.length?'검증 오류 '+R.err.length+'건을 고쳐야 내보낼 수 있습니다.':'게임 로더 검증을 통과했습니다.')+'</p>'
+  +'<div class="row"><button class="btn pri" data-r="export"'+(R.err.length?' disabled':'')+'>시나리오 JSON 내보내기</button></div>'
+  +'<div class="row"><button class="btn sm" data-r="exportPng">지도 PNG만 내려받기</button></div>'
+  +'<p class="hint">검증 기준: 게임 everyline-rail '+esc(typeof GAME_VER!=='undefined'?GAME_VER:'?')+'의 validScen. 게임이 바뀌면 tools/extract.js로 다시 뽑습니다.</p></div>'
+  +'<div class="sec"><h3>크기</h3><p class="hint">'+(R.S?Math.round(JSON.stringify(R.S).length/1024)+' KB':'–')+'</p></div>';}
+ R.innerHTML=h;}
+// 오른쪽 입력 → 상태
+const tq=(v,d)=>{const x=parseFloat(v);return isFinite(x)?x:d;};
+$('#right').addEventListener('change',e=>{const t=e.target,id=t.id,v=t.type==='checkbox'?t.checked:t.value;if(!id)return;
+ if(id==='refOp'||id==='brush'||id==='nAttr')return;          // 화면 값 · 적용 단추가 있는 칸은 되돌리기 기록을 남기지 않는다
+ if(id==='refShow'){refShow=v;draw();return;}
+ if(id==='nName'&&sel.kind==='node'){renameNode(sel.i,v);renderAll();return;}
+ const n=sel.kind==='node'?E.nodes[sel.i]:null,a=n&&(n.a||(n.a={}));
+ let rerender=true;push();
+ // 개요
+ if(id==='mId')E.meta.id=v.trim();if(id==='mVer')E.meta.ver=v.trim();if(id==='mTitle')E.meta.title=v;if(id==='mTag')E.meta.tag=v;if(id==='mDesc')E.meta.desc=v;if(id==='mHid')E.meta.hidden=v;
+ if(id==='mKm')E.kmpp=Math.max(.0001,tq(v,E.kmpp));
+ const bm={bDem:'dem',bWmin:'wmin',bCity:'cityW',bSmall:'small',bK0:'k0',bK1:'k1'};if(bm[id])E.bal[bm[id]]=tq(v,E.bal[bm[id]]);
+ if(/^dk\d$/.test(id))E.dem[+id[2]][1]=v;
+ // 지도
+  if(/^cL[oa]\d$/.test(id)){const q=+id[3];E.calib.p[q][id[2]==='o'?'lon':'lat']=tq(v,null);}
+ // 노드
+ if(n){
+  if(id==='nX')n.x=tq(v,n.x);if(id==='nY')n.y=tq(v,n.y);if(id==='nReg')n.r=+v;if(id==='nW')n.w=Math.max(0,tq(v,n.w));if(id==='nHub')n.hub=v?1:0;
+  if(id==='nSmall')a.small=v?1:0;if(id==='nGun')a.gun=v?1:0;if(id==='nMount'){v?E.mount.add(n.n):E.mount.delete(n.n);}
+  if(id==='nPush'&&v==='#num')a.push=.5;if(id==='nPushV')a.push=tq(v,.5);
+  if(id==='nPull'){if(v==='#num')a.pull=.3;else if(v!=='#curve')a.pull=v;}if(id==='nPullV')a.pull=tq(v,.3);
+  if(id==='nInd')a.ind=v.trim()||undefined;
+  if(id==='nPar'){if(v){a.parent=v;n.w=0;a.acc=a.acc||3;delete a.push;delete a.pull;delete a.small;delete a.gun;const p=E.nodes.find(x=>x.n===v);if(p)n.r=p.r;}
+   else{delete a.parent;delete a.acc;delete a.unlock;delete a.hid;delete a.sea;delete a.only;n.w=n.w||.5;a.push=.5;a.pull='일반시';}}
+  if(id==='nAcc')a.acc=tq(v,3);if(id==='nUnl'){const w=tq(v,null);if(w==null)delete a.unlock;else a.unlock={by:a.parent,w};}
+  if(id==='nHid')a.hid=v?1:0;if(id==='nSea')a.sea=v?1:0;if(id==='nOnly')a.only=v.trim()||undefined;
+}
+ // 권역
+ if(id==='rName')E.regions[regPaint]=v;
+ if(id==='rPol'){E.pregs.forEach(R=>{R.pv=(R.pv||[]).filter(c=>c!==regPaint);});const R=E.pregs.find(x=>x.id===v);if(R){R.pv.push(regPaint);R.pv.sort((x,y)=>x-y);}}
+ if(/^pg\d$/.test(id))E.pregs[+id[2]].nm=v;
+ // 챕터
+ const c=sel.kind==='ch'?E.chapters[sel.i]:null;
+ if(c){if(id==='cNm')c.nm=v;if(id==='cY0'){const y=tq(v,c.y0)|0;if(sel.i>0&&c.pre==='p'+c.y0&&!E.presets['p'+y]){E.presets['p'+y]=E.presets[c.pre];delete E.presets[c.pre];c.pre='p'+y;}c.y0=y;}
+  if(id==='cY1')c.y1=tq(v,c.y1)|0;if(id==='cCap')c.cap=tq(v,c.cap);if(id==='cOp')c.opin0=tq(v,c.opin0);if(id==='cPress')c.press=v;
+  if(id.startsWith('cf_')){const vid=id.slice(3);c.fleet=c.fleet||[];const k=c.fleet.indexOf(vid);if(v&&k<0)c.fleet.push(vid);if(!v&&k>=0)c.fleet.splice(k,1);}
+  const gm=id.match(/^g(\d)(nm|m|k|t|d)$/);if(gm){const g=c.goals[+gm[1]];
+   if(gm[2]==='nm')g.nm=v;if(gm[2]==='d')g.desc=v;
+   if(gm[2]==='m'){g.m=v;const M=MET.find(x=>x[0]===v);if(M){g.k=M[2];g.tgt=M[2]==='ratio'?.8:M[2]==='lteRatio'?.6:M[2]==='pax'?600:M[2]==='km'?250:M[2]==='lteMoney'?3e11:1;if(v==='dblRatio')g.tgt=1;}
+    if(v==='dblRatio')g.axis='gyeongbu';else delete g.axis;}
+   if(gm[2]==='k')g.k=v;
+   if(gm[2]==='t'){const x=tq(v,0);g.tgt=g.k==='pax'&&g.m==='pax'?x*10:(g.k==='ratio'||g.k==='lteRatio')?x/100:g.k==='lteMoney'?x*1e8:x;}}}
+ // 프리셋
+ const P=tab==='preset'?curPreset():null;
+ if(P){if(id==='pGr')P.gr=+v;
+  if(sel.kind==='tk'&&P.tk[sel.i]){const tk=P.tk[sel.i];if(id==='tN')tk[3]=+v;if(id==='tHs')tk[2]=v?1:0;}
+  if(lineEdit>=0&&P.ln[lineEdit]){const L=P.ln[lineEdit];if(id==='lNm')L[0]=v;if(id==='lTr')L[3]=Math.max(0,tq(v,L[3])|0);if(id==='lHs')L[1]=v?1:0;}}
+ if(rerender)renderAll();else draw();});
+$('#right').addEventListener('input',e=>{if(e.target.id==='refOp'){refOp=+e.target.value;draw();}if(e.target.id==='brush'){brush=+e.target.value;e.target.parentNode.nextElementSibling.textContent=(brush*2-1)+'칸';draw();}});
+$('#right').addEventListener('click',e=>{const t=e.target.closest('[data-r],[data-mat],[data-g0]');if(!t)return;
+ if(t.dataset.mat!=null){mat=+t.dataset.mat;if(tool!=='fill')tool='paint';renderAll();return;}
+ if(t.dataset.g0!=null){const P=curPreset();const nm=t.dataset.g0;push();const k=P.g0.indexOf(nm);k>=0?P.g0.splice(k,1):P.g0.push(nm);renderAll();return;}
+ const r=t.dataset.r,n=sel.kind==='node'?E.nodes[sel.i]:null;
+ if(r==='fillAll'){push();E.grid.mask.fill(mat);mcache&&(mcache.dirty=true);}
+ if(r==='refLoad'){$('#fImg').click();return;}
+ if(r==='refDel'){refImg=null;}
+ if(r==='refFit'&&refImg){push();const ar=refImg.naturalHeight/refImg.naturalWidth;resizeGrid(E.grid.W,Math.max(1,Math.round(E.grid.W*ar)),cs());}
+ if(r==='refAuto'&&refImg){if(!confirm('지금 칠한 육지 · 바다를 참고 이미지로 새로 만듭니다. 계속할까요?'))return;push();const g=maskFromImage(refImg,E.grid.W,E.grid.H,false);E.grid.mask=g.mask;mcache=null;toast('파란 계열은 바다, 나머지는 육지로 나눴습니다. 붓으로 다듬으십시오');}
+ if(r==='resize'){const W=Math.max(4,tq($('#gW').value,E.grid.W)|0),H=Math.max(4,tq($('#gH').value,E.grid.H)|0),c2=Math.max(.1,tq($('#gCs').value,cs()));
+  if(W*H>4e6){toast('칸이 너무 많습니다 (400만 칸 이하)');return;}push();resizeGrid(W,H,c2);fitView();}
+ if(r==='calOn'){push();E.calib={p:[{},{}],next:0};tool='calib';}
+ if(r==='calOff'){push();E.calib=null;E.proj=VIRT_PROJ.slice();if(tool==='calib')tool='paint';}
+ if(r==='calApply'){const p=E.calib.p;if(p.some(q=>q.x==null||q.lon==null||q.lat==null)){toast('두 점 모두 지도 위치와 경위도가 있어야 합니다');return;}
+  const dlo=p[1].lon-p[0].lon,dla=p[0].lat-p[1].lat;if(Math.abs(dlo)<1e-6||Math.abs(dla)<1e-6){toast('두 점의 경도와 위도가 모두 달라야 합니다(대각선으로 떨어진 두 점)');return;}
+  push();const cx=(p[1].x-p[0].x)/dlo,cy=(p[1].y-p[0].y)/dla;
+  if(cx<=0||cy<=0){toast('동쪽 점이 오른쪽에, 북쪽 점이 위쪽에 있어야 합니다');UNDO.pop();return;}
+  E.proj=[p[0].x,p[0].lon,cx,p[0].y,p[0].lat,cy];
+  const km=hav(p[0].lon,p[0].lat,p[1].lon,p[1].lat),du=Math.hypot(p[1].x-p[0].x,p[1].y-p[0].y);if(du>0)E.kmpp=km/du;
+  toast('투영을 계산했습니다 · 1단위 ≈ '+E.kmpp.toFixed(4)+'km');}
+ if(r==='mkCap'&&n){push();const i=sel.i;E.nodes.unshift(E.nodes.splice(i,1)[0]);sel.i=0;}
+ if(r==='attrApply'&&n){try{const o=JSON.parse($('#nAttr').value||'{}');if(typeof o!=='object'||Array.isArray(o))throw 0;push();n.a=o;}catch(_){toast('JSON 객체가 아닙니다');return;}}
+ if(r==='delNode'&&n){delNode(sel.i);}
+ if(r==='delReg'){const i=regPaint;if(E.nodes.some(x=>x.r===i)&&!confirm('이 지역의 노드를 0번 지역으로 옮기고 지울까요?'))return;push();
+  E.regions.splice(i,1);E.nodes.forEach(x=>{if(x.r===i)x.r=0;else if(x.r>i)x.r--;});
+  E.pregs.forEach(R=>{R.pv=(R.pv||[]).filter(c=>c!==i).map(c=>c>i?c-1:c);});regPaint=Math.max(0,i-1);}
+ const c=sel.kind==='ch'?E.chapters[sel.i]:null;
+ if(r==='addGoal'&&c){push();c.goals=c.goals||[];c.goals.push({nm:'새 목표',m:'pax',tgt:600,k:'pax',desc:''});}
+ if(r==='delGoal'&&c){push();c.goals.splice(+t.dataset.q,1);}
+ if(r==='delCh'&&c){if(!confirm((sel.i+1)+'챕터를 지울까요?'))return;push();const pre=c.pre;E.chapters.splice(sel.i,1);
+  if(pre&&!E.chapters.some(x=>x.pre===pre))delete E.presets[pre];if(E.chapters[0])E.chapters[0].pre=null;sel={kind:null,i:-1};}
+ const P=tab==='preset'?curPreset():null;
+ if(r==='delTk'&&P){push();P.tk.splice(sel.i,1);sel={kind:null,i:-1};}
+ if(r==='delLn'&&P){push();P.ln.splice(lineEdit,1);lineEdit=-1;}
+ if(r==='revLn'&&P){push();P.ln[lineEdit][2].reverse();}
+ if(r==='export'){doExport();return;}
+ if(r==='exportPng'){dl(maskPNG(),(E.meta.id||'map')+'-map.png');return;}
+ renderAll();});
+function resizeGrid(W,H,c2){const g=E.grid,m=new Uint8Array(W*H);
+ for(let j=0;j<Math.min(H,g.H);j++)for(let i=0;i<Math.min(W,g.W);i++)m[j*W+i]=g.mask[j*g.W+i];
+ const old=cs(),k=c2/old;E.nodes.forEach(n=>{n.x=r2(n.x*k);n.y=r2(n.y*k);});E.peaks=E.peaks.map(p=>[Math.round(p[0]*k),Math.round(p[1]*k)]);
+ if(E.calib&&E.calib.p)E.calib.p.forEach(p=>{if(p.x!=null){p.x*=k;p.y*=k;}});
+ // 투영은 지도 좌표 기준이므로 칸 크기가 바뀌면 같은 경위도를 유지하도록 고친다
+ if(k!==1){const p=E.proj;E.proj=[p[0]*k,p[1],p[2]*k,p[3]*k,p[4],p[5]*k];E.kmpp=E.kmpp/k;}
+ E.grid={W,H,mask:m};E.mw=W*c2;E.mh=H*c2;mcache=null;}
+
+/* ------------------------------------------------------------------ 파일 */
+function dl(url,name){const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),300);}
+function doExport(){const R=checkAll();if(R.err.length){setTab('check');toast('검증 오류가 있어 내보내지 않았습니다');return;}
+ const b=new Blob([JSON.stringify(R.S)],{type:'application/json'});const u=URL.createObjectURL(b);
+ dl(u,(E.meta.id||'scenario')+'-'+(E.meta.ver||'0')+'.json');setTimeout(()=>URL.revokeObjectURL(u),1000);dirty=false;
+ toast(R.warn.length?'내보냈습니다 · 경고 '+R.warn.length+'건은 검증 탭에서 확인하십시오':'내보냈습니다');}
+$('#bExport').onclick=doExport;
+$('#bCheck').onclick=()=>setTab('check');
+$('#bUndo').onclick=undo;$('#bRedo').onclick=redo;
+$('#bOpen').onclick=()=>$('#fOpen').click();
+$('#fOpen').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const rd=new FileReader();
+ rd.onload=()=>{let o;try{o=JSON.parse(rd.result);}catch(_){toast('JSON을 읽지 못했습니다');return;}
+  if(!o||typeof o!=='object'||!o.map||!Array.isArray(o.nodes)){toast('시나리오 파일이 아닙니다 (map · nodes가 없음)');return;}
+  if(dirty&&!confirm('저장하지 않은 작업이 있습니다. 열까요?'))return;
+  o.__from='file';loadScenario(o).then(()=>{const er=validScen(o);toast(f.name+' 열기'+(er.length?' · 원본 검증 오류 '+er.length+'건':''));});};
+ rd.readAsText(f);};
+$('#fImg').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const u=URL.createObjectURL(f);const im=new Image();
+ im.onload=()=>{refImg=im;refShow=true;renderAll();toast('참고 이미지를 깔았습니다');};im.src=u;};
+$('#bNew').onclick=()=>openNew();
+
+function openNew(first){
+ const d=document.createElement('div');d.className='dlg';
+ d.innerHTML='<div class="box"><h2>'+(first?'Everyline 맵 제작기':'새 지도')+'</h2>'
+ +(first?'<p class="hint">Everyline: Rail의 유저 시나리오(맵)를 만들어 JSON 하나로 내보냅니다. 게임의 「시나리오 파일 불러오기」로 엽니다.</p>':'')
+ +'<div class="opt on" data-k="blank"><b>빈 지도에서 시작</b><span>바다만 있는 지도에 육지를 칠하고 도시를 놓습니다. 시스템 값은 한국 시나리오를 빌립니다</span></div>'
+ +'<div class="opt" data-k="gr"><b>가람 지방을 고쳐 쓰기</b><span>튜토리얼의 작은 가상 지방(도시 일곱)을 바탕으로 합니다</span></div>'
+ +'<div class="opt" data-k="kr"><b>한국 시나리오 열기</b><span>게임 기본 시나리오 전체(노드 '+((BASE_KR&&BASE_KR.nodes||[]).length)+'곳 · 챕터 넷 · 의뢰 · 사건 포함)를 엽니다</span></div>'
+ +'<div id="blankOpt"><div class="sec" style="padding:8px 0;border:none"><div class="grid2">'
+ +F.text('nwId','식별자','mymap')+F.text('nwTitle','제목','새 지방')+F.num('nwW','가로 칸',300,'1')+F.num('nwH','세로 칸',220,'1')+F.num('nwCs','칸 크기',2,'0.1')+F.num('nwKm','km/단위',.52235,'0.0001')
+ +'</div>'+F.sel('nwFill','처음 칸',0,[[0,'모두 바다'],[1,'모두 육지']])+'<p class="hint">한국 지도는 438 × 600칸, 칸 크기 2, 0.522km/단위(약 457 × 627km)입니다.</p></div></div>'
+ +'<div class="row" style="justify-content:flex-end;margin-top:10px">'+(first?'':'<button class="btn" data-x="cancel">취소</button>')+'<button class="btn pri" data-x="ok">시작</button></div></div>';
+ document.body.appendChild(d);let k='blank';
+ d.addEventListener('click',e=>{const o=e.target.closest('.opt');if(o){k=o.dataset.k;d.querySelectorAll('.opt').forEach(x=>x.classList.toggle('on',x===o));d.querySelector('#blankOpt').style.display=k==='blank'?'':'none';}
+  const x=e.target.closest('[data-x]');if(!x)return;if(x.dataset.x==='cancel'){d.remove();return;}
+  if(!first&&dirty&&!confirm('저장하지 않은 작업이 사라집니다. 계속할까요?'))return;
+  if(k==='blank'){const id=(d.querySelector('#nwId').value||'mymap').trim();const W=Math.max(8,tq(d.querySelector('#nwW').value,300)|0),H=Math.max(8,tq(d.querySelector('#nwH').value,220)|0);
+   const b=blankScenario({id,title:d.querySelector('#nwTitle').value||'새 지방',W,H,cs:Math.max(.1,tq(d.querySelector('#nwCs').value,2)),kmpp:tq(d.querySelector('#nwKm').value,.52235),fill:+d.querySelector('#nwFill').value});
+   b.raw.__from='blank';loadScenario(b.raw,{W:b.W,H:b.H,mask:b.mask});tab='map';tool='paint';mat=1;}
+  else{const src=clone(k==='kr'?BASE_KR:BASE_GR);src.__from=k;src.id=src.id+'_mod';src.title=src.title+' (수정본)';delete src.hidden;
+   loadScenario(src).then(()=>{tab='meta';renderAll();toast('기본 시나리오와 겹치지 않게 식별자를 '+src.id+'로 바꿔 두었습니다');});}
+  d.remove();renderAll();});
+}
+
+/* ------------------------------------------------------------------ 공통 */
+let toastT=0;function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600);}
+function renderBadge(){if(!E||!E.grid)return;const R=checkAll();const b=$('#hBadge');b.textContent=R.err.length||'✓';b.className='badge'+(R.err.length?'':' ok');
+ b.title=R.err.length?'검증 오류 '+R.err.length+'건':'게임 로더 검증 통과';$('#hName').textContent=(E.meta.title||'')+' · '+(E.meta.id||'');}
+let badgeT=0;
+function renderAll(){renderLeft();renderRight();renderToolbar();draw();clearTimeout(badgeT);badgeT=setTimeout(renderBadge,120);
+ $('#bUndo').disabled=!UNDO.length;$('#bRedo').disabled=!REDO.length;}
+$('#hVer').textContent='게임 '+(typeof GAME_VER!=='undefined'?GAME_VER:'');
+// 처음 화면: 가람 지방을 열어 둔 채로 시작 대화상자를 띄운다
+resize();
+{const g=clone(BASE_GR);g.__from='gr';g.id='garam_mod';g.title='가람 지방 (수정본)';delete g.hidden;
+ loadScenario(g).then(()=>{resize();fitView();renderAll();openNew(true);});}
+})();
+</script>
+</body>
+</html>
